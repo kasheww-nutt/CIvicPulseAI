@@ -1,76 +1,83 @@
 import { useDemo } from '../context/DemoContext';
-import { CaseCard } from '../components/shared/CaseCard';
-import { Target, AlertTriangle, ShieldCheck } from 'lucide-react';
-import { Badge } from '../components/ui/Badge';
+import { MissionRow } from '../components/shared/MissionRow';
+import { Target, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function Missions() {
   const { cases, verifyCase, location } = useDemo();
+  const navigate = useNavigate();
 
   const activeMissions = cases.filter(c => c.status !== 'Resolved' && c.status !== 'Fix Verified');
   const resolvedMissions = cases.filter(c => c.status === 'Resolved');
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto pb-10">
-      <header className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
-           <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center border border-blue-200 shrink-0">
-             <Target className="w-6 h-6 text-blue-700" />
+    <div className="flex flex-col bg-slate-50 min-h-screen pb-20">
+      <header className="bg-white px-4 py-3 border-b border-slate-200 flex items-center gap-3 sticky top-0 z-10">
+        <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-slate-500 hover:text-slate-900 md:hidden">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div className="flex items-center gap-2">
+           <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center border border-blue-200 shrink-0">
+             <Target className="w-4 h-4 text-blue-700" />
            </div>
-           <div>
-             <h1 className="text-2xl font-bold tracking-tight text-slate-900">Nearby Missions</h1>
-             <p className="text-sm text-slate-500 font-medium">Earn Civic Trust by verifying cases in {location || 'your area'}</p>
-           </div>
+           <h1 className="text-lg font-bold text-slate-900 leading-tight">Nearby Missions</h1>
         </div>
       </header>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 text-sm text-amber-900 items-start shadow-sm">
-         <AlertTriangle className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
-         <div className="flex flex-col gap-1">
-           <strong className="font-semibold text-amber-900">Safety First</strong>
-           <p className="text-amber-800 leading-relaxed">Do not enter unsafe roads, restricted areas, or dangerous locations to verify a case. Observe from a safe distance.</p>
-         </div>
-      </div>
-
-      <section className="mt-2">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-            Active Cases <Badge className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200">+5 Trust</Badge>
-          </h2>
+      <div className="p-4 flex flex-col gap-5">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 md:p-4 flex gap-3 text-sm text-amber-900 items-start shadow-sm">
+           <AlertTriangle className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
+           <div className="flex flex-col gap-0.5">
+             <strong className="font-semibold text-amber-900 text-sm">Safety First</strong>
+             <p className="text-amber-800 leading-snug text-xs">Do not enter unsafe or restricted areas. Observe from a safe distance.</p>
+           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {activeMissions.map(c => (
-            <CaseCard 
-              key={c.id} 
-              item={c} 
-              onVerify={() => verifyCase(c.id, 'verify')} 
-            />
-          ))}
-          {activeMissions.length === 0 && (
-             <div className="col-span-full bg-slate-50 border border-slate-200 rounded-xl p-8 text-center text-slate-500 text-sm">
-               No active missions nearby right now.
+
+        <section className="flex flex-col gap-2">
+          <div className="flex items-center justify-between px-1 mb-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Active Cases
+            </h2>
+            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">+5 Trust</span>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+            {activeMissions.length > 0 ? (
+              activeMissions.map(c => (
+                <MissionRow 
+                  key={c.id} 
+                  item={c} 
+                  onVerify={() => verifyCase(c.id, 'verify')} 
+                />
+              ))
+            ) : (
+              <div className="p-8 text-center text-slate-500 text-sm font-medium">
+                 No active missions nearby right now.
+              </div>
+            )}
+          </div>
+        </section>
+
+        {resolvedMissions.length > 0 && (
+           <section className="flex flex-col gap-2 mt-2">
+             <div className="flex items-center justify-between px-1 mb-1">
+               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                 Confirm Fixed
+               </h2>
+               <span className="text-[10px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-100">+12 Trust</span>
              </div>
-          )}
-        </div>
-      </section>
-
-      {resolvedMissions.length > 0 && (
-         <section className="mt-6 pt-6 border-t border-slate-200">
-           <div className="flex items-center justify-between mb-4">
-             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-               Confirm Fixed <Badge className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200">+12 Trust</Badge>
-             </h2>
-           </div>
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-             {resolvedMissions.map(c => (
-               <CaseCard 
-                 key={c.id} 
-                 item={c} 
-                 onVerify={() => verifyCase(c.id, 'fixed')} 
-               />
-             ))}
-           </div>
-         </section>
-      )}
+             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+               {resolvedMissions.map(c => (
+                 <MissionRow 
+                   key={c.id} 
+                   item={c} 
+                   onVerify={() => verifyCase(c.id, 'fixed')} 
+                 />
+               ))}
+             </div>
+           </section>
+        )}
+      </div>
     </div>
   )
 }
+
