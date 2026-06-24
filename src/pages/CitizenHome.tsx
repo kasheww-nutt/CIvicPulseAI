@@ -60,23 +60,45 @@ export function CitizenHome() {
       </div>
 
       {/* 2. Map Preview (Placeholder) */}
-      <div className="w-full h-40 bg-slate-200 relative overflow-hidden border-b border-slate-200 flex items-center justify-center">
-        {/* Abstract CSS Map grid */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to right, #64748b 1px, transparent 1px), linear-gradient(to bottom, #64748b 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, #2563eb 0%, transparent 60%)' }} />
+      <div className="w-full h-48 bg-slate-100 relative overflow-hidden border-b border-slate-200 flex items-center justify-center">
+        {/* Realistic CSS Map Base */}
+        <div className="absolute inset-0 opacity-40 pointer-events-none" style={{
+          backgroundImage: `
+            linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0),
+            linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0)
+          `,
+          backgroundSize: '20px 20px',
+          backgroundPosition: '0 0, 10px 10px'
+        }} />
+        <div className="absolute inset-0 opacity-20" style={{ 
+          backgroundImage: 'linear-gradient(to right, #94a3b8 2px, transparent 2px), linear-gradient(to bottom, #94a3b8 2px, transparent 2px)', 
+          backgroundSize: '100px 100px' 
+        }} />
+        <div className="absolute inset-0 opacity-50 bg-gradient-to-t from-slate-200/80 to-transparent" />
+        
+        {/* Confidence/Radius Ring */}
+        <div className="absolute w-32 h-32 bg-blue-500/10 border border-blue-500/30 rounded-full flex items-center justify-center pointer-events-none">
+          <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/30 rounded-full" />
+        </div>
         
         {/* Location Radar Indicator */}
-        <div className="relative w-12 h-12 flex items-center justify-center">
-          <div className="absolute w-full h-full bg-blue-500/20 rounded-full animate-ping" />
-          <div className="w-4 h-4 bg-blue-600 border-2 border-white rounded-full shadow-md" />
+        <div className="relative w-12 h-12 flex items-center justify-center z-10">
+          <div className="absolute w-full h-full bg-blue-500/30 rounded-full animate-ping" />
+          <div className="w-3.5 h-3.5 bg-blue-600 border-2 border-white rounded-full shadow-md" />
         </div>
         
         {/* Fake Pins */}
-        <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-red-500 border-2 border-white rounded-full shadow-sm" />
-        <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-orange-500 border-2 border-white rounded-full shadow-sm" />
+        <div className="absolute top-1/4 left-1/4 w-2.5 h-2.5 bg-red-500 border border-white rounded-full shadow-sm" />
+        <div className="absolute bottom-1/3 right-1/4 w-2.5 h-2.5 bg-orange-500 border border-white rounded-full shadow-sm" />
+        <div className="absolute top-1/3 right-1/3 w-2.5 h-2.5 bg-red-500 border border-white rounded-full shadow-sm opacity-50" />
         
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-red-500" /> {priorityCases.length} urgent nearby
+        {/* Recenter Control */}
+        <button className="absolute top-3 right-3 bg-white p-2 rounded-md shadow-sm border border-slate-200 text-slate-600 hover:text-slate-900 z-10">
+          <Navigation className="w-4 h-4" />
+        </button>
+        
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border border-slate-200 text-[10px] font-semibold text-slate-700 flex items-center gap-1.5 z-10">
+          <span className="w-2 h-2 rounded-full bg-red-500" /> {priorityCases.length} nearby cases
         </div>
       </div>
 

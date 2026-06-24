@@ -79,8 +79,8 @@ export function MyCases() {
           <div className="p-12 text-center text-slate-500 flex flex-col items-center gap-3">
             <ShieldCheck className="w-12 h-12 text-slate-300" />
             <div>
-              <h3 className="text-sm font-bold text-slate-700">No cases here yet</h3>
-              <p className="text-xs mt-1">Get out there and start helping your community.</p>
+              <h3 className="text-sm font-semibold text-slate-700">No active cases</h3>
+              <p className="text-xs mt-1 text-slate-500">Cases you report or follow will appear here.</p>
             </div>
           </div>
         )}

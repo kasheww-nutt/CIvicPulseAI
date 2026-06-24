@@ -85,7 +85,7 @@ export function CaseDetail() {
                    <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
                    <span className="truncate">{caseItem.locationLabel}</span>
                  </div>
-                 <span>•</span>
+                 <span>-</span>
                  <span className="whitespace-nowrap">{caseItem.age}</span>
                </div>
              </div>
@@ -194,7 +194,7 @@ export function CaseDetail() {
         
         {userRole === 'admin' && (
           <button className="w-full bg-slate-900 text-white font-bold text-sm py-3 rounded-xl shadow-sm hover:bg-slate-800 transition-colors" onClick={() => navigate(`/escalation/${caseItem.id}`)}>
-            Generate Escalation Packet
+            Review Packet
           </button>
         )}
       </div>

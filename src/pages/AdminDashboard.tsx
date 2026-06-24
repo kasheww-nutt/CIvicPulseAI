@@ -51,7 +51,7 @@ export function AdminDashboard() {
          <Card className="shadow-sm border-slate-200">
            <CardContent className="p-4 md:p-5 flex flex-col gap-1">
              <div className="flex justify-between items-center mb-1">
-               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Ready to Escalate</span>
+               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Review packets ready</span>
                <TrendingUp className="w-4 h-4 text-blue-500" />
              </div>
              <span className="text-2xl md:text-3xl font-bold text-slate-900">{readyCases.length}</span>
@@ -108,25 +108,25 @@ export function AdminDashboard() {
          {/* Authority Ready */}
          <section className="flex flex-col gap-4">
            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-             Ready for Escalation <Badge className="bg-blue-100 text-blue-800 border-blue-200">{readyCases.length}</Badge>
+             Prepared Packets <Badge className="bg-blue-100 text-blue-800 border-blue-200">{readyCases.length}</Badge>
            </h2>
            <div className="flex flex-col gap-3">
              {readyCases.slice(0, 5).map(c => (
                 <div key={c.id} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col gap-2 cursor-pointer hover:border-slate-300 transition-colors" onClick={() => navigate(`/escalation/${c.id}`)}>
                   <div className="flex justify-between items-start gap-2">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2 py-0.5 rounded truncate max-w-[180px]">{c.suggestedDepartment}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-800 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded shrink-0">Ready</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-800 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded shrink-0">Prepared</span>
                   </div>
                   <h3 className="font-semibold text-slate-900 leading-snug">{c.title}</h3>
                   <div className="text-xs font-medium text-slate-500 mt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <span className="flex items-center gap-1 text-green-700 bg-green-50 px-1.5 py-0.5 rounded border border-green-100 w-fit"><CheckCircle2 className="w-3.5 h-3.5"/> Verified by {c.verificationCount} citizens</span>
-                    <span className="text-blue-600 font-semibold hover:underline">Generate Packet &rarr;</span>
+                    <span className="text-blue-600 font-semibold hover:underline">Review Packet &rarr;</span>
                   </div>
                 </div>
              ))}
              {readyCases.length === 0 && (
                <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 text-center text-slate-500 text-sm">
-                 No cases currently ready for escalation.
+                 No prepared packets currently.
                </div>
              )}
            </div>

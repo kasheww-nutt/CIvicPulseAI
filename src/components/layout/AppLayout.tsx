@@ -80,6 +80,7 @@ export function AppLayout() {
         {isCitizenFlow && location.pathname !== '/report' && (
           <button 
             onClick={() => navigate('/report')}
+            aria-label="Report new issue"
             className="fixed bottom-20 right-4 md:absolute md:bottom-20 md:right-4 w-14 h-14 bg-blue-600 text-white rounded-2xl shadow-lg flex items-center justify-center hover:bg-blue-700 transition-transform active:scale-95 z-30"
           >
             <Plus className="w-7 h-7" />
@@ -88,15 +89,14 @@ export function AppLayout() {
 
         {/* Bottom Navigation (Android PWA Style) */}
         {isCitizenFlow ? (
-          <nav className="fixed bottom-0 w-full max-w-[430px] bg-white border-t border-slate-200 flex items-center justify-between px-2 z-30 pb-safe shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)]">
+          <nav className="fixed bottom-0 w-full max-w-[430px] bg-white border-t border-slate-200 flex items-center justify-between px-2 z-30 pb-safe shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] h-16">
             <NavItem to="/" icon={<Home />} label="Home" active={location.pathname === '/'} />
             <NavItem to="/missions" icon={<Target />} label="Missions" active={location.pathname === '/missions'} />
-            <div className="w-16" /> {/* Spacer for visual balance if needed, or just regular items */}
             <NavItem to="/cases" icon={<LayoutDashboard />} label="My Cases" active={location.pathname === '/cases'} />
             <NavItem to="/profile" icon={<UserCircle />} label="Trust" active={location.pathname === '/profile'} />
           </nav>
         ) : (
-          <nav className="fixed bottom-0 w-full bg-white border-t border-slate-200 flex items-center justify-around md:hidden z-30 pb-safe">
+          <nav className="fixed bottom-0 w-full bg-white border-t border-slate-200 flex items-center justify-around md:hidden z-30 pb-safe h-16">
             <NavItem to="/dashboard" icon={<LayoutDashboard />} label="Dashboard" active={location.pathname === '/dashboard'} />
             <NavItem to="/" icon={<Home />} label="App Preview" active={location.pathname === '/'} />
           </nav>
@@ -112,7 +112,7 @@ import type { ReactNode } from 'react';
 function NavItem({ to, icon, label, active }: { to: string, icon: ReactNode, label: string, active: boolean }) {
   return (
     <Link to={to} className={cn(
-      "flex flex-col items-center gap-1 p-2 min-w-[64px] flex-1 transition-colors", 
+      "flex flex-col items-center justify-center gap-1 min-w-[64px] h-full flex-1 transition-colors relative", 
       active ? "text-blue-600" : "text-slate-500 hover:text-slate-900"
     )}>
       <div className={cn(
