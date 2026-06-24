@@ -1,6 +1,10 @@
 {
-  "name": "",
-  "description": "",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "name": "CivicPulse AI",
+  "description": "Community Hero - Hyperlocal Problem Solver. A mobile-first Android/PWA civic field-reporting app to identify, verify, and resolve local civic issues.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

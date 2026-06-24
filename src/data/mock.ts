@@ -151,7 +151,7 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Manual pin',
     duplicateRisk: 'Low',
     proofLadderStage: 3,
-    nextBestAction: 'Dispatch electrical inspector.'
+    nextBestAction: 'Prepare electrical inspector review.'
   },
   {
     id: 'c-009',

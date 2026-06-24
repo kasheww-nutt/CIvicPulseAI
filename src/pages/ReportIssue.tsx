@@ -156,16 +156,30 @@ export function ReportIssue() {
              />
           </div>
 
-          <div className="p-4 flex gap-4">
-             <div className="flex-1 flex flex-col gap-1">
+          <div className="p-4 grid grid-cols-2 gap-4">
+             <div className="flex flex-col gap-1">
                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Assigned Dept</label>
-               <span className="text-sm font-semibold text-slate-900">Public Works (PWD)</span>
+               <select className="text-sm font-semibold text-slate-900 bg-transparent border-none outline-none focus:ring-0 p-0 appearance-none">
+                 <option>Public Works (PWD)</option>
+                 <option>Water Board (BWSSB)</option>
+                 <option>Electricity (BESCOM)</option>
+               </select>
              </div>
-             <div className="flex-1 flex flex-col gap-1 border-l border-slate-100 pl-4">
+             <div className="flex flex-col gap-1 border-l border-slate-100 pl-4">
                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Location Source</label>
-               <span className="text-sm font-semibold text-slate-900 flex items-center gap-1">
-                 <MapPin className="w-3.5 h-3.5 text-blue-500" /> Photo GPS
-               </span>
+               <select className="text-sm font-semibold text-slate-900 bg-transparent border-none outline-none focus:ring-0 p-0 appearance-none">
+                 <option>Photo GPS (High Conf)</option>
+                 <option>Device GPS (Med Conf)</option>
+                 <option>Manual (Low Conf)</option>
+               </select>
+             </div>
+             <div className="flex flex-col gap-1 pt-4 border-t border-slate-100 col-span-2">
+               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Evidence Quality</label>
+               <select className="text-sm font-semibold text-slate-900 bg-transparent border-none outline-none focus:ring-0 p-0 appearance-none">
+                 <option>High (Clear landmarks)</option>
+                 <option>Medium (Slightly blurry)</option>
+                 <option>Low (Needs review)</option>
+               </select>
              </div>
           </div>
         </div>

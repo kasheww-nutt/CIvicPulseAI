@@ -4,7 +4,15 @@ import { MapPin, Clock, ShieldCheck, AlertTriangle, ChevronRight } from 'lucide-
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 
-export function MissionRow({ item, onVerify, compact = false }: { item: CivicCase, onVerify?: () => void, compact?: boolean }) {
+import React from 'react';
+
+export interface MissionRowProps {
+  item: CivicCase;
+  onVerify?: () => void;
+  compact?: boolean;
+}
+
+export const MissionRow: React.FC<MissionRowProps> = ({ item, onVerify, compact = false }) => {
   const navigate = useNavigate();
 
   return (

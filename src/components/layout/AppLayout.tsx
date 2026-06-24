@@ -107,7 +107,9 @@ export function AppLayout() {
   )
 }
 
-function NavItem({ to, icon, label, active }: { to: string, icon: React.ReactNode, label: string, active: boolean }) {
+import type { ReactNode } from 'react';
+
+function NavItem({ to, icon, label, active }: { to: string, icon: ReactNode, label: string, active: boolean }) {
   return (
     <Link to={to} className={cn(
       "flex flex-col items-center gap-1 p-2 min-w-[64px] flex-1 transition-colors", 

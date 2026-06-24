@@ -39,7 +39,7 @@ export function EscalationPacket() {
             <Building className="w-4 h-4 text-slate-500" />
             <div className="text-xs font-bold text-slate-700 uppercase tracking-wider">Case Reference: #{caseItem.id.toUpperCase()}</div>
           </div>
-          <Badge className="bg-blue-100 text-blue-800 border-blue-200 w-fit font-semibold uppercase tracking-wider text-[10px]">Ready for Dispatch</Badge>
+          <Badge className="bg-blue-100 text-blue-800 border-blue-200 w-fit font-semibold uppercase tracking-wider text-[10px]">Prepared for review</Badge>
         </div>
         <CardContent className="p-6 md:p-8 flex flex-col gap-8">
            <div>
@@ -89,7 +89,7 @@ export function EscalationPacket() {
 
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p className="text-xs text-slate-500 max-w-md leading-relaxed">
-          <strong>Demo Notice:</strong> Exporting this packet prepares it for municipal review in this demo environment. It does not automatically file a legal complaint with a real authority.
+          <strong>Demo Notice:</strong> Prepared for review. Not automatically submitted to a real authority.
         </p>
         <div className="flex gap-2 w-full sm:w-auto">
           <Button variant="outline" className="w-full sm:w-auto gap-2 bg-white text-slate-700">
