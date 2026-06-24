@@ -12,6 +12,8 @@ import { ReportIssue } from './pages/ReportIssue';
 import { CaseDetail } from './pages/CaseDetail';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { EscalationPacket } from './pages/EscalationPacket';
+import { MyCases } from './pages/MyCases';
+import { Profile } from './pages/Profile';
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<CitizenHome />} />
             <Route path="/missions" element={<Missions />} />
+            <Route path="/cases" element={<MyCases />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/report" element={<ReportIssue />} />
             <Route path="/case/:id" element={<CaseDetail />} />
             <Route path="/dashboard" element={<AdminDashboard />} />

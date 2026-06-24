@@ -202,5 +202,4 @@ export function CaseDetail() {
     </div>
   )
 }
-;
 
