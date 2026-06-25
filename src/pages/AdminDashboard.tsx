@@ -24,7 +24,7 @@ export function AdminDashboard() {
              </div>
              <div>
                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Civic Operations Console</h1>
-               <p className="text-sm text-slate-500">Live overview of priority issues and community signals.</p>
+               <p className="text-sm text-slate-500">Demo overview of priority issues and community verification signals.</p>
              </div>
           </div>
           <div className="hidden md:flex text-sm text-slate-500 items-center gap-2">
@@ -127,6 +127,43 @@ export function AdminDashboard() {
              {readyCases.length === 0 && (
                <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 text-center text-slate-500 text-sm">
                  No prepared packets currently.
+               </div>
+             )}
+           </div>
+         </section>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+         {/* Duplicate Fusion Review */}
+         <section className="flex flex-col gap-4 lg:col-span-2">
+           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+             Duplicate Fusion Review <Badge className="bg-amber-100 text-amber-800 border-amber-200">{duplicateRiskCases.length}</Badge>
+           </h2>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             {duplicateRiskCases.map(c => (
+                <div key={c.id} className="bg-white border-2 border-amber-200 p-4 rounded-xl shadow-sm flex flex-col gap-3">
+                  <div className="flex justify-between items-start">
+                    <span className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-100 px-2 py-1 rounded flex items-center gap-1"><Layers className="w-3.5 h-3.5" /> High Duplicate Risk</span>
+                  </div>
+                  <h3 className="font-bold text-slate-900">{c.title}</h3>
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex flex-col gap-2">
+                    <div className="text-xs text-slate-600">
+                      <strong>Issue DNA Match:</strong> Similar description and same geo-bucket as existing cases.
+                    </div>
+                    <div className="text-xs text-slate-600">
+                      <strong>Recommendation:</strong> Merge evidence or verify separately.
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    <button className="text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-white py-2 rounded shadow-sm hover:bg-slate-800 transition-colors" onClick={() => navigate(`/case/${c.id}`)}>Review</button>
+                    <button className="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 py-2 rounded border border-blue-200 hover:bg-blue-200 transition-colors">Merge</button>
+                    <button className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 py-2 rounded border border-slate-200 hover:bg-slate-200 transition-colors">Keep Sep.</button>
+                  </div>
+                </div>
+             ))}
+             {duplicateRiskCases.length === 0 && (
+               <div className="col-span-1 md:col-span-2 bg-slate-50 p-6 rounded-xl border border-slate-200 text-center text-slate-500 text-sm">
+                 No duplicate fusion cases to review.
                </div>
              )}
            </div>

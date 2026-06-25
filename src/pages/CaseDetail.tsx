@@ -24,6 +24,28 @@ export function CaseDetail() {
     setShowFusionModal(true);
   };
 
+  let nextBestAction = caseItem.nextBestAction;
+  if (!caseItem.verifiedByMe) {
+    if (caseItem.duplicateRisk === 'High') {
+      nextBestAction = 'confirm duplicate';
+    } else if (caseItem.locationSource === 'Manual pin') {
+      nextBestAction = 'verify location';
+    } else if (caseItem.evidenceQuality === 'Low') {
+      nextBestAction = 'add clearer photo';
+    } else if (caseItem.status === 'Resolved') {
+      nextBestAction = 'mark fix verified';
+    }
+  } else {
+    if (caseItem.status === 'Authority Ready') {
+      nextBestAction = 'wait for reviewer packet';
+    } else if (caseItem.status === 'Escalated') {
+      nextBestAction = 'wait for resolution';
+    }
+  }
+  if (userRole === 'admin' && caseItem.status === 'Authority Ready') {
+    nextBestAction = 'review prepared packet';
+  }
+
   return (
     <div className="flex flex-col bg-slate-50 min-h-screen pb-28 md:pb-10 relative">
       <header className="bg-white px-4 py-3 border-b border-slate-200 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
@@ -90,31 +112,40 @@ export function CaseDetail() {
                </div>
              </div>
 
-             {/* Diagnostic Summary */}
-             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-               <div className="flex items-center gap-2 mb-2">
+             {/* Case Intelligence */}
+             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col gap-4">
+               <div className="flex items-center gap-2 mb-1">
                  <ShieldCheck className="w-4 h-4 text-blue-600" />
-                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Diagnostic Summary</h3>
+                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Case Intelligence</h3>
                </div>
-               <p className="text-sm text-slate-700 leading-relaxed font-medium">{caseItem.aiSummary}</p>
                
-               <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-4">
-                 <div>
-                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Assigned Dept</span>
-                   <span className="text-sm font-bold text-slate-900">{caseItem.suggestedDepartment}</span>
+               <div className="flex flex-col gap-2">
+                 <p className="text-sm text-slate-700 leading-relaxed font-medium bg-white p-3 rounded-lg border border-slate-200">
+                   <strong>AI Summary:</strong> {caseItem.aiSummary}
+                 </p>
+                 
+                 <div className="grid grid-cols-2 gap-2 mt-2">
+                   <div className="bg-white p-2 rounded border border-slate-200">
+                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Evidence Quality</span>
+                     <span className="text-xs font-bold text-slate-900">{caseItem.evidenceQuality}</span>
+                   </div>
+                   <div className="bg-white p-2 rounded border border-slate-200">
+                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Location Confidence</span>
+                     <span className="text-xs font-bold text-slate-900">{caseItem.locationSource === 'Manual pin' ? 'Low' : 'High'}</span>
+                   </div>
                  </div>
-                 <div>
-                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Evidence Quality</span>
-                   <span className="text-sm font-bold text-slate-900">{caseItem.evidenceQuality}</span>
-                 </div>
+
+                 {caseItem.duplicateRisk === 'High' && (
+                   <div className="flex items-start gap-2 text-xs font-medium text-amber-800 bg-amber-50 p-3 rounded-lg border border-amber-200 mt-2">
+                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                     <div className="flex flex-col gap-1">
+                       <strong className="uppercase tracking-wider font-bold text-[10px] text-amber-700">Duplicate Risk: High</strong>
+                       <span>Issue DNA matches existing cases in this geo-bucket. Verification needed to confirm status.</span>
+                     </div>
+                   </div>
+                 )}
                </div>
              </div>
-             
-             {caseItem.duplicateRisk === 'High' && (
-                <div className="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200 uppercase tracking-wider w-fit">
-                  <AlertTriangle className="w-4 h-4" /> High Duplicate Risk
-                </div>
-             )}
            </div>
 
            {/* Proof Ladder - Mobile view inline */}
@@ -124,7 +155,7 @@ export function CaseDetail() {
              
              <div className="mt-6 pt-5 border-t border-slate-100">
                <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Next Best Action</h4>
-               <p className="text-sm text-slate-800 font-semibold">{caseItem.nextBestAction}</p>
+               <p className="text-sm text-slate-800 font-semibold">{nextBestAction}</p>
              </div>
              
              <div className="mt-5 pt-5 border-t border-slate-100">
@@ -147,7 +178,7 @@ export function CaseDetail() {
            <div className="mt-8 pt-6 border-t border-slate-200">
              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Next Best Action</h4>
              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-               <p className="text-sm text-slate-700 font-medium">{caseItem.nextBestAction}</p>
+               <p className="text-sm text-slate-700 font-medium">{nextBestAction}</p>
              </div>
            </div>
            

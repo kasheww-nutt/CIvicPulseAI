@@ -12,7 +12,21 @@ export function CitizenHome() {
 
   const priorityCases = cases
     .filter(c => c.status !== 'Resolved' && c.status !== 'Fix Verified')
-    .sort((a, b) => b.severity - a.severity)
+    .sort((a, b) => {
+      let scoreA = a.severity * 10;
+      if (a.duplicateRisk === 'High') scoreA += 15;
+      if (a.evidenceQuality === 'Low') scoreA += 10;
+      if (a.locationSource === 'Manual pin') scoreA += 5;
+      scoreA -= a.verificationCount;
+
+      let scoreB = b.severity * 10;
+      if (b.duplicateRisk === 'High') scoreB += 15;
+      if (b.evidenceQuality === 'Low') scoreB += 10;
+      if (b.locationSource === 'Manual pin') scoreB += 5;
+      scoreB -= b.verificationCount;
+
+      return scoreB - scoreA;
+    })
     .slice(0, 4);
 
   const handleUseLocation = () => {

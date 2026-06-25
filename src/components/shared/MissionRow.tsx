@@ -45,6 +45,14 @@ export const MissionRow: React.FC<MissionRowProps> = ({ item, onVerify, compact 
         <h3 className="font-semibold text-sm leading-snug text-slate-900 line-clamp-2">
           {item.title}
         </h3>
+
+        {/* Mission Reason Label */}
+        <div className="flex flex-wrap gap-1 mt-1">
+          {item.duplicateRisk === 'High' && <span className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded font-medium">Duplicate check needed</span>}
+          {item.evidenceQuality === 'Low' && <span className="text-[10px] bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded font-medium">Evidence quality low</span>}
+          {item.locationSource === 'Manual pin' && <span className="text-[10px] bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded font-medium">Needs location confirmation</span>}
+          {item.severity >= 4 && <span className="text-[10px] bg-red-50 text-red-700 border border-red-200 px-1.5 py-0.5 rounded font-medium">High safety risk</span>}
+        </div>
         
         <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
           <div className="flex items-center gap-1 truncate">

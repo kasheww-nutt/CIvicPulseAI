@@ -1,10 +1,12 @@
 import { useDemo } from '../context/DemoContext';
 import { UserCircle, ShieldCheck, TrendingUp, CheckCircle2, History, Settings, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export function Profile() {
   const { trustScore, userRole, setRole } = useDemo();
   const navigate = useNavigate();
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <div className="flex flex-col bg-slate-50 min-h-screen pb-20">
@@ -18,13 +20,36 @@ export function Profile() {
             Profile
           </h1>
         </div>
-        <button className="text-slate-400 hover:text-slate-900">
+        <button onClick={() => setShowSettings(!showSettings)} className={`p-1 rounded-full ${showSettings ? 'bg-slate-100 text-slate-900' : 'text-slate-400 hover:text-slate-900'}`}>
           <Settings className="w-5 h-5" />
         </button>
       </div>
 
       <div className="p-4 flex flex-col gap-6">
         
+        {showSettings && (
+          <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Settings</p>
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Demo Role Switch</label>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setRole('citizen')}
+                  className={`flex-1 py-2 px-3 rounded text-xs font-semibold transition-all ${userRole === 'citizen' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                >
+                  Citizen
+                </button>
+                <button 
+                  onClick={() => { setRole('admin'); navigate('/dashboard'); }}
+                  className={`flex-1 py-2 px-3 rounded text-xs font-semibold transition-all ${userRole === 'admin' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                >
+                  Reviewer
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Civic Trust Header */}
         <div className="bg-slate-900 rounded-xl p-5 text-white shadow-sm relative overflow-hidden flex flex-col gap-1">
           <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -100,25 +125,6 @@ export function Profile() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Profile Switch */}
-        <div className="mt-2 flex items-center justify-between px-1 py-2">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Demo Role Switch</p>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setRole('citizen')}
-              className={`px-3 py-1.5 rounded text-xs font-semibold transition-all ${userRole === 'citizen' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-            >
-              Citizen
-            </button>
-            <button 
-              onClick={() => { setRole('admin'); navigate('/dashboard'); }}
-              className={`px-3 py-1.5 rounded text-xs font-semibold transition-all ${userRole === 'admin' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-            >
-              Reviewer
-            </button>
           </div>
         </div>
 
