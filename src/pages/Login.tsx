@@ -115,17 +115,17 @@ export function Login() {
     e.preventDefault();
     if (email === 'demo@civicpulse.ai' && password === 'pass123') {
       demoLogin();
-      const mappedRole = selectedRole === 'citizen' ? 'citizen' : 'admin';
+      const mappedRole = selectedRole || 'citizen';
       setRole(mappedRole);
-      navigate(mappedRole === 'admin' ? '/dashboard' : '/');
+      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
       return;
     }
     
     try {
       await signInWithEmail(email, password);
-      const mappedRole = selectedRole === 'citizen' ? 'citizen' : 'admin';
+      const mappedRole = selectedRole || 'citizen';
       setRole(mappedRole);
-      navigate(mappedRole === 'admin' ? '/dashboard' : '/');
+      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
     } catch (err: any) {
       setError(getErrorMessage(err));
     }
@@ -139,17 +139,17 @@ export function Login() {
     }
     if (email === 'demo@civicpulse.ai' && password === 'pass123') {
       demoLogin();
-      const mappedRole = selectedRole === 'citizen' ? 'citizen' : 'admin';
+      const mappedRole = selectedRole || 'citizen';
       setRole(mappedRole);
-      navigate(mappedRole === 'admin' ? '/dashboard' : '/');
+      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
       return;
     }
     
     try {
       await signUpWithEmail(email, password);
-      const mappedRole = selectedRole === 'citizen' ? 'citizen' : 'admin';
+      const mappedRole = selectedRole || 'citizen';
       setRole(mappedRole);
-      navigate(mappedRole === 'admin' ? '/dashboard' : '/');
+      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
     } catch (err: any) {
       setError(getErrorMessage(err));
     }
@@ -158,9 +158,9 @@ export function Login() {
   const handleGoogleLogin = async () => {
     try {
       await signInWithGoogle();
-      const mappedRole = selectedRole === 'citizen' ? 'citizen' : 'admin';
+      const mappedRole = selectedRole || 'citizen';
       setRole(mappedRole);
-      navigate(mappedRole === 'admin' ? '/dashboard' : '/');
+      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
     } catch (err: any) {
       setError(getErrorMessage(err));
     }
@@ -168,9 +168,9 @@ export function Login() {
 
   const handleGuestLogin = () => {
     demoLogin();
-    const mappedRole = selectedRole === 'citizen' ? 'citizen' : 'admin';
+    const mappedRole = selectedRole || 'citizen';
     setRole(mappedRole);
-    navigate(mappedRole === 'admin' ? '/dashboard' : '/');
+    navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
   };
 
   const resetForm = () => {

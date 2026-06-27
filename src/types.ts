@@ -52,7 +52,7 @@ export interface WalletTransaction {
 }
 
 export interface DemoState {
-  userRole: 'citizen' | 'admin';
+  userRole: 'citizen' | 'steward' | 'admin';
   trustScore: number;
   walletBalance: number;
   walletTransactions: WalletTransaction[];

@@ -116,18 +116,24 @@ export function Profile() {
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Settings</p>
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Demo Role Switch</label>
-              <div className="flex gap-2 bg-[#f8f9fc] dark:bg-slate-900 p-1.5 rounded-full border border-[#e2e8f0] dark:border-slate-700">
+              <div className="flex flex-col sm:flex-row gap-2 bg-[#f8f9fc] dark:bg-slate-900 p-1.5 rounded-[20px] border border-[#e2e8f0] dark:border-slate-700">
                 <button 
                   onClick={() => setRole('citizen')}
-                  className={`flex-1 py-2.5 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'citizen' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                  className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'citizen' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                 >
                   Citizen
                 </button>
                 <button 
-                  onClick={() => { setRole('admin'); navigate('/dashboard'); }}
-                  className={`flex-1 py-2.5 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'admin' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                  onClick={() => { setRole('steward'); navigate('/dashboard'); }}
+                  className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'steward' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                 >
-                  Reviewer
+                  Steward
+                </button>
+                <button 
+                  onClick={() => { setRole('admin'); navigate('/dashboard'); }}
+                  className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'admin' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                >
+                  Admin
                 </button>
               </div>
             </div>

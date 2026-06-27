@@ -302,10 +302,16 @@ export function CitizenHome() {
                   </Link>
                   <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
                   <button 
+                    onClick={() => { setRole('steward'); navigate('/dashboard'); }}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Switch to Steward
+                  </button>
+                  <button 
                     onClick={() => { setRole('admin'); navigate('/dashboard'); }}
                     className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left"
                   >
-                    <ShieldCheck className="w-4 h-4" /> Switch to Reviewer
+                    <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Switch to Admin
                   </button>
                   <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
                   <button 

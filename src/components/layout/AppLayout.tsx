@@ -71,19 +71,27 @@ export function AppLayout() {
                 <div className="absolute top-10 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg rounded-xl py-2 w-48 z-50">
                   <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700 mb-2">
                     <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Profile</p>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{userRole === 'admin' ? 'Reviewer View' : 'Citizen View'}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                      {userRole === 'admin' ? 'Admin View' : userRole === 'steward' ? 'Steward View' : 'Citizen View'}
+                    </p>
                   </div>
                   <button 
                     className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
                     onClick={() => { setRole('citizen'); setShowProfileMenu(false); navigate('/'); }}
                   >
-                    {t('app.switchCitizen')}
+                    Switch to Citizen
+                  </button>
+                  <button 
+                    className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={() => { setRole('steward'); setShowProfileMenu(false); navigate('/dashboard'); }}
+                  >
+                    Switch to Steward
                   </button>
                   <button 
                     className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
                     onClick={() => { setRole('admin'); setShowProfileMenu(false); navigate('/dashboard'); }}
                   >
-                    {t('app.switchReviewer')}
+                    Switch to Admin
                   </button>
                   <div className="border-t border-slate-100 dark:border-slate-700 mt-1 pt-1">
                     <button 

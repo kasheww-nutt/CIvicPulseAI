@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 import { createNotification } from '../lib/notifications';
 
 interface DemoContextType extends DemoState {
-  setRole: (role: 'citizen' | 'admin') => void;
+  setRole: (role: 'citizen' | 'steward' | 'admin') => void;
   setLocation: (loc: string | null) => void;
   verifyCase: (id: string, actionType: 'verify' | 'duplicate' | 'fixed' | 'location' | 'warden_duplicate' | 'warden_resolve') => void;
   reportCase: (newCase: CivicCase) => void;
@@ -21,7 +21,7 @@ const DemoContext = createContext<DemoContextType | undefined>(undefined);
 
 export function DemoProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [userRole, setRole] = useState<'citizen' | 'admin'>('citizen');
+  const [userRole, setRole] = useState<'citizen' | 'steward' | 'admin'>('citizen');
   const [trustScore, setTrustScore] = useState(148);
   const [walletBalance, setWalletBalance] = useState(12.50);
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([
