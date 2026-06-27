@@ -18,7 +18,9 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Photo GPS',
     duplicateRisk: 'Low',
     proofLadderStage: 2,
-    nextBestAction: 'Ready for authority escalation. Await municipal review.'
+    nextBestAction: 'Ready for authority escalation. Await municipal review.',
+    lat: 12.9345,
+    lng: 77.6265
   },
   {
     id: 'c-002',
@@ -37,7 +39,14 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Device location',
     duplicateRisk: 'Low',
     proofLadderStage: 0,
-    nextBestAction: 'Needs community verification to confirm flow rate.'
+    nextBestAction: 'Needs community verification to confirm flow rate.',
+    authorId: 'me',
+    lat: 12.9784,
+    lng: 77.6408,
+    bounty: {
+      amount: 1.50,
+      sponsor: "Cafe Coffee Day (Indiranagar)"
+    }
   },
   {
     id: 'c-003',
@@ -56,7 +65,9 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Manual pin',
     duplicateRisk: 'Low',
     proofLadderStage: 3,
-    nextBestAction: 'Immediate dispatch required by operations team.'
+    nextBestAction: 'Immediate dispatch required by operations team.',
+    lat: 12.9755,
+    lng: 77.6068
   },
   {
     id: 'c-004',
@@ -75,7 +86,9 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Demo area',
     duplicateRisk: 'Medium',
     proofLadderStage: 1,
-    nextBestAction: 'Verify if adjacent lights are also affected.'
+    nextBestAction: 'Verify if adjacent lights are also affected.',
+    lat: 12.9081,
+    lng: 77.6476
   },
   {
     id: 'c-005',
@@ -94,7 +107,11 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Photo GPS',
     duplicateRisk: 'Low',
     proofLadderStage: 5,
-    nextBestAction: 'Needs community verification that the area is fully cleared.'
+    nextBestAction: 'Needs community verification that the area is fully cleared.',
+    imagePlaceholder: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80',
+    fixedImagePlaceholder: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80',
+    lat: 12.9205,
+    lng: 77.5855
   },
   {
     id: 'c-006',
@@ -113,7 +130,14 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Photo GPS',
     duplicateRisk: 'High',
     proofLadderStage: 4,
-    nextBestAction: 'Awaiting repair crew dispatch.'
+    nextBestAction: 'Awaiting repair crew dispatch.',
+    authorId: 'me',
+    lat: 12.9254,
+    lng: 77.6734,
+    bounty: {
+      amount: 5.00,
+      sponsor: "Bellandur Tech Park Association"
+    }
   },
   {
     id: 'c-007',
@@ -132,7 +156,10 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Device location',
     duplicateRisk: 'Low',
     proofLadderStage: 2,
-    nextBestAction: 'Batch with routine maintenance.'
+    nextBestAction: 'Batch with routine maintenance.',
+    authorId: 'me',
+    lat: 12.9765,
+    lng: 77.5925
   },
   {
     id: 'c-008',
@@ -151,7 +178,9 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Manual pin',
     duplicateRisk: 'Low',
     proofLadderStage: 3,
-    nextBestAction: 'Prepare electrical inspector review.'
+    nextBestAction: 'Prepare electrical inspector review.',
+    lat: 12.9698,
+    lng: 77.7499
   },
   {
     id: 'c-009',
@@ -170,7 +199,9 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Photo GPS',
     duplicateRisk: 'Low',
     proofLadderStage: 1,
-    nextBestAction: 'Verify flow obstruction severity.'
+    nextBestAction: 'Verify flow obstruction severity.',
+    lat: 13.0068,
+    lng: 77.5684
   },
   {
     id: 'c-010',
@@ -189,6 +220,9 @@ export const mockCases: CivicCase[] = [
     locationSource: 'Device location',
     duplicateRisk: 'Low',
     proofLadderStage: 0,
-    nextBestAction: 'Needs community verification.'
+    nextBestAction: 'Needs community verification.',
+    authorId: 'me',
+    lat: 12.9165,
+    lng: 77.6101
   }
 ];

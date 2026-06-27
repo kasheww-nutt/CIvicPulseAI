@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "Notification": {
+      "title": "Notification",
+      "description": "A notification sent to a user.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user receiving the notification."
+        },
+        "title": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "isRead": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "object",
+          "description": "Firestore server timestamp"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["verification", "claimed", "other"]
+        },
+        "caseId": {
+          "type": "string"
+        }
+      },
+      "required": ["userId", "title", "message", "isRead", "type", "caseId"]
+    }
+  },
+  "firestore": {
+    "notifications/{notificationId}": {
+      "schema": {
+        "$ref": "Notification"
+      },
+      "description": "Stores user notifications."
+    }
+  }
+}

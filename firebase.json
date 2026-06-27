@@ -1,0 +1,6 @@
+{
+  "firestore": {
+    "database": "ai-studio-civicpulseai-85d7672b-dd22-4c42-a32e-dd3970a78ff8",
+    "rules": "firestore.rules"
+  }
+}
