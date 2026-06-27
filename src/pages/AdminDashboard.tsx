@@ -113,30 +113,32 @@ export function AdminDashboard() {
   };
 
   // --- NEW INTERACTIVE ADMIN STATE ---
-  // A. System Parameters Config
-  const [slaHours, setSlaHours] = useState(24);
-  const [rewardMultiplier, setRewardMultiplier] = useState(1.5);
-  const [twilioSmsNotification, setTwilioSmsNotification] = useState(true);
-  const [autoNotifyWarden, setAutoNotifyWarden] = useState(false);
-  const [directApiHook, setDirectApiHook] = useState(true);
-  const [systemLogs, setSystemLogs] = useState<string[]>([
-    "System parameters successfully initialized.",
-    "Twilio SMS gateway link configured.",
-    "Bounty multiplier set to default 1.5x."
-  ]);
+  const {
+    stewards,
+    fraudAlerts,
+    disbursals,
+    inboxMessages,
+    systemLogs,
+    slaHours,
+    rewardMultiplier,
+    twilioSmsNotification,
+    autoNotifyWarden,
+    directApiHook,
+    addSteward,
+    toggleStewardStatus,
+    actionFraud,
+    approveDisbursal,
+    acknowledgeInboxMessage,
+    addSystemLog,
+    setSlaHours,
+    setRewardMultiplier,
+    setTwilioSmsNotification,
+    setAutoNotifyWarden,
+    setDirectApiHook
+  } = useDemo();
 
-  const addLog = (msg: string) => {
-    const time = new Date().toLocaleTimeString();
-    setSystemLogs(prev => [`[${time}] ${msg}`, ...prev]);
-  };
+  const addLog = addSystemLog;
 
-  // B. Steward Assignments
-  const [stewards, setStewards] = useState([
-    { id: 'st-1', name: 'Arjun Mehta', ward: 'Indiranagar', category: 'Pothole / road damage', activeCases: 4, trustRating: '98%', status: 'Active' },
-    { id: 'st-2', name: 'Priya Sharma', ward: 'Koramangala', category: 'Broken streetlight', activeCases: 2, trustRating: '99%', status: 'Active' },
-    { id: 'st-3', name: 'Rajesh Kumar', ward: 'Indiranagar', category: 'Water leakage', activeCases: 7, trustRating: '95%', status: 'Active' },
-    { id: 'st-4', name: 'Sneha Reddy', ward: 'Whitefield', category: 'Garbage overflow', activeCases: 5, trustRating: '97%', status: 'Active' }
-  ]);
   const [newStewardName, setNewStewardName] = useState("");
   const [newStewardWard, setNewStewardWard] = useState("Indiranagar");
   const [newStewardCategory, setNewStewardCategory] = useState("Pothole / road damage");
@@ -144,67 +146,28 @@ export function AdminDashboard() {
   const handleAddSteward = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newStewardName.trim()) return;
-    const newSt = {
-      id: `st-${stewards.length + 1}`,
+    addSteward({
       name: newStewardName,
       ward: newStewardWard,
-      category: newStewardCategory,
-      activeCases: 0,
-      trustRating: '100%',
-      status: 'Active'
-    };
-    setStewards(prev => [...prev, newSt]);
-    addLog(`Assigned Steward ${newStewardName} to Ward ${newStewardWard} for category: ${newStewardCategory}`);
+      category: newStewardCategory
+    });
     setNewStewardName("");
   };
 
   const handleRevokeSteward = (id: string, name: string) => {
-    setStewards(prev => prev.map(s => s.id === id ? { ...s, status: s.status === 'Active' ? 'Revoked' : 'Active' } : s));
-    const currentSt = stewards.find(s => s.id === id);
-    const action = currentSt?.status === 'Active' ? 'Revoked' : 'Reinstated';
-    addLog(`${action} credentials for Steward ${name}`);
+    toggleStewardStatus(id);
   };
-
-  // C. Fraud/Integrity Engine
-  const [fraudAlerts, setFraudAlerts] = useState([
-    { id: 'fr-1', user: 'Rohan_99', reason: 'High similarity in image uploads (potential stock match)', anomalyScore: 88, status: 'Flagged', location: 'Indiranagar' },
-    { id: 'fr-2', user: 'Aisha_K', reason: 'Multiple rapid duplicates submitted in < 5 mins', anomalyScore: 92, status: 'Flagged', location: 'Whitefield' },
-    { id: 'fr-3', user: 'Vikram_X', reason: 'Repeated self-verification patterns flagged by AI model', anomalyScore: 74, status: 'Flagged', location: 'Koramangala' }
-  ]);
 
   const handleActionFraud = (id: string, user: string, action: 'blacklist' | 'dismiss') => {
-    if (action === 'blacklist') {
-      setFraudAlerts(prev => prev.map(f => f.id === id ? { ...f, status: 'Blacklisted' } : f));
-      addLog(`ADMIN ACTION: Blacklisted citizen ${user} due to pattern manipulation alerts.`);
-    } else {
-      setFraudAlerts(prev => prev.filter(f => f.id !== id));
-      addLog(`ADMIN ACTION: Dismissed fraud alert for citizen ${user}. No anomaly confirmed.`);
-    }
+    actionFraud(id, user, action);
   };
-
-  // D. Disbursals, Ledger & Money Flow
-  const [disbursals, setDisbursals] = useState([
-    { id: 'ds-1', user: 'shaikkashif40@gmail.com', amount: 25.50, method: 'PayPal', status: 'Pending Approval', timestamp: '2 hours ago' },
-    { id: 'ds-2', user: 'kavitha_b', amount: 15.00, method: 'Bank Transfer', status: 'Pending Approval', timestamp: '5 hours ago' },
-    { id: 'ds-3', user: 'rahul_m', amount: 45.75, method: 'UPI', status: 'Approved & Disbursed', timestamp: '1 day ago' },
-    { id: 'ds-4', user: 'anil_sharma', amount: 12.00, method: 'PayPal', status: 'Approved & Disbursed', timestamp: '2 days ago' }
-  ]);
 
   const handleApproveDisbursal = (id: string, user: string, amount: number) => {
-    setDisbursals(prev => prev.map(d => d.id === id ? { ...d, status: 'Approved & Disbursed' } : d));
-    addLog(`Approved ledger disbursal of $${amount.toFixed(2)} to ${user}. Sent instructions to municipal treasury bank portal.`);
+    approveDisbursal(id);
   };
 
-  // E. Municipal Inbox
-  const [inboxMessages, setInboxMessages] = useState([
-    { id: 'ib-1', sender: 'Director, Indiranagar Water Supply', subject: 'Pipe burst ticket integration (#WS-401)', snippet: 'We detected a spike in community reports of Indiranagar metro water leakage. Please link this to our official work order.', date: '10 mins ago', acknowledged: false },
-    { id: 'ib-2', sender: 'ACP Traffic, Koramangala Zone', subject: 'Road defect verification priority request', snippet: 'Traffic congestion is critical at 100 Feet Rd due to pothole. Requesting immediate steward prioritization.', date: '1 hour ago', acknowledged: false },
-    { id: 'ib-3', sender: 'SWM Joint Commissioner', subject: 'Garbage landfill collection delay alert', snippet: 'Please throttle high-severity garbage alerts for Koramangala Block A until Sunday morning as trash trucks are delayed.', date: '3 hours ago', acknowledged: false }
-  ]);
-
   const handleAcknowledgeMessage = (id: string, sender: string) => {
-    setInboxMessages(prev => prev.map(m => m.id === id ? { ...m, acknowledged: true } : m));
-    addLog(`Acknowledged departmental message from ${sender}. Integrated coordination metrics.`);
+    acknowledgeInboxMessage(id);
   };
 
   const handleRelayTwilio = (sender: string, subject: string) => {
@@ -386,7 +349,7 @@ export function AdminDashboard() {
                   </div>
                ))}
                {duplicateFusionReview.length === 0 && (
-                 <div className="bg-white p-6 rounded-[24px] border border-[#e2e8f0] text-center text-slate-500 text-sm font-medium shadow-sm">
+                 <div className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 text-sm font-medium shadow-sm">
                    No duplicates detected.
                  </div>
                )}
@@ -417,7 +380,7 @@ export function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
             <div className="lg:col-span-5 flex flex-col gap-5">
               <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Operation Overview</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Operation Overview</span>
                 <p className="text-sm text-slate-300 leading-relaxed font-medium">
                   Generate high-quality intelligence documents. CivicPulse translates citizen reports into structured budget forecasts and density maps, making it easy for slow or paper-based departments to execute work orders.
                 </p>
@@ -441,7 +404,7 @@ export function AdminDashboard() {
                 </div>
 
                 <div className="flex flex-col gap-2 pt-2 border-t border-slate-900">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Export Protocols</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Export Protocols</span>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={handleSendReport}
@@ -469,7 +432,7 @@ export function AdminDashboard() {
 
             <div className="lg:col-span-7 flex flex-col gap-4">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Live Executive Digest Preview</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Live Executive Digest Preview</span>
                 <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Sync Active</span>
               </div>
 
@@ -503,17 +466,17 @@ export function AdminDashboard() {
                 <div className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
                   <div className="grid grid-cols-3 gap-3 text-center border-b border-slate-900 pb-4">
                     <div className="flex flex-col bg-slate-900/50 p-2.5 rounded-xl border border-slate-900">
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Total Reports</span>
+                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total Reports</span>
                       <span className="text-lg font-black text-white mt-0.5">{cases.length}</span>
                     </div>
                     <div className="flex flex-col bg-slate-900/50 p-2.5 rounded-xl border border-slate-900">
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Verified Signals</span>
+                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Verified Signals</span>
                       <span className="text-lg font-black text-emerald-400 mt-0.5">
                         {cases.filter(c => (c.verificationCount || 0) > 0).length}
                       </span>
                     </div>
                     <div className="flex flex-col bg-slate-900/50 p-2.5 rounded-xl border border-slate-900">
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Aggregated Cost</span>
+                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Aggregated Cost</span>
                       <span className="text-lg font-black text-red-400 mt-0.5">
                         ${cases.reduce((acc, c) => {
                           let baseCost = 250;
@@ -529,7 +492,7 @@ export function AdminDashboard() {
                   </div>
 
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Geographic Cluster Rankings</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Geographic Cluster Rankings</span>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-slate-900/30 p-3 rounded-xl border border-slate-900/80 flex flex-col gap-1.5">
                         <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Neighborhood Densities</span>
@@ -608,11 +571,11 @@ export function AdminDashboard() {
 
           <div className="flex items-center gap-3 shrink-0 self-start md:self-center">
             <div className="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-end text-right">
-              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Active SLA Core</span>
+              <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Active SLA Core</span>
               <span className="text-sm font-black text-slate-800 dark:text-white">{slaHours}h Target</span>
             </div>
             <div className="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-end text-right">
-              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Multiplier rate</span>
+              <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Multiplier rate</span>
               <span className="text-sm font-black text-slate-800 dark:text-white">{rewardMultiplier.toFixed(1)}x rewards</span>
             </div>
           </div>
@@ -625,12 +588,12 @@ export function AdminDashboard() {
           <span className="flex items-center gap-2 font-black text-[10px] uppercase text-blue-400 tracking-wider">
             <Radio className="w-4 h-4 text-blue-400 animate-pulse" /> Live Administration Log Protocols
           </span>
-          <span className="text-[9px] text-slate-500">System State: Ready</span>
+          <span className="text-[9px] text-slate-400">System State: Ready</span>
         </div>
         <div className="flex flex-col gap-1 max-h-[85px] overflow-y-auto font-mono text-slate-300">
           {systemLogs.map((log, i) => (
             <div key={i} className="flex gap-2 text-[11px]">
-              <span className="text-slate-500 select-none">&gt;</span>
+              <span className="text-slate-400 select-none">&gt;</span>
               <span className={log.includes("ACTION") ? "text-amber-400 font-bold" : log.includes("SUCCESS") ? "text-emerald-400 font-bold" : "text-slate-300"}>{log}</span>
             </div>
           ))}
@@ -640,42 +603,42 @@ export function AdminDashboard() {
       {/* Top Level Key-Metrics Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] p-5 shadow-sm flex flex-col gap-1">
-          <div className="flex justify-between items-center text-slate-400 dark:text-slate-500">
+          <div className="flex justify-between items-center text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-black uppercase tracking-wider">Registered Stewards</span>
             <Users className="w-5 h-5 text-blue-500" />
           </div>
           <span className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-            {stewards.filter(s => s.status === 'Active').length} <span className="text-xs font-medium text-slate-500">active</span>
+            {stewards.filter(s => s.status === 'Active').length} <span className="text-xs font-medium text-slate-500 dark:text-slate-400">active</span>
           </span>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] p-5 shadow-sm flex flex-col gap-1">
-          <div className="flex justify-between items-center text-slate-400 dark:text-slate-500">
+          <div className="flex justify-between items-center text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-black uppercase tracking-wider">Fraud Alerts Risk</span>
             <FraudIcon className="w-5 h-5 text-amber-500" />
           </div>
           <span className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">
-            {fraudAlerts.filter(a => a.status === 'Flagged').length} <span className="text-xs font-medium text-slate-500">flagged</span>
+            {fraudAlerts.filter(a => a.status === 'Flagged').length} <span className="text-xs font-medium text-slate-500 dark:text-slate-400">flagged</span>
           </span>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] p-5 shadow-sm flex flex-col gap-1">
-          <div className="flex justify-between items-center text-slate-400 dark:text-slate-500">
+          <div className="flex justify-between items-center text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-black uppercase tracking-wider">Pending Claims Disbursals</span>
             <DollarSign className="w-5 h-5 text-emerald-500" />
           </div>
           <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
-            {disbursals.filter(d => d.status.startsWith('Pending')).length} <span className="text-xs font-medium text-slate-500">claims</span>
+            {disbursals.filter(d => d.status.startsWith('Pending')).length} <span className="text-xs font-medium text-slate-500 dark:text-slate-400">claims</span>
           </span>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] p-5 shadow-sm flex flex-col gap-1">
-          <div className="flex justify-between items-center text-slate-400 dark:text-slate-500">
+          <div className="flex justify-between items-center text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-black uppercase tracking-wider">Official Inbound</span>
             <Inbox className="w-5 h-5 text-purple-500" />
           </div>
           <span className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">
-            {inboxMessages.filter(m => !m.acknowledged).length} <span className="text-xs font-medium text-slate-500">pending sync</span>
+            {inboxMessages.filter(m => !m.acknowledged).length} <span className="text-xs font-medium text-slate-500 dark:text-slate-400">pending sync</span>
           </span>
         </div>
       </div>
@@ -718,7 +681,7 @@ export function AdminDashboard() {
                     }}
                     className="w-full accent-blue-600 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg cursor-pointer"
                   />
-                  <span className="text-[10px] text-slate-400">Determines case urgency escalation milestones.</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Determines case urgency escalation milestones.</span>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -739,7 +702,7 @@ export function AdminDashboard() {
                     }}
                     className="w-full accent-blue-600 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg cursor-pointer"
                   />
-                  <span className="text-[10px] text-slate-400">Multiplies the USD bounty rewards issued to verifying citizens.</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Multiplies the USD bounty rewards issued to verifying citizens.</span>
                 </div>
               </div>
 
@@ -752,7 +715,7 @@ export function AdminDashboard() {
                     <Smartphone className="w-5 h-5 text-slate-500 mt-0.5" />
                     <div>
                       <p className="text-xs font-bold">Severity 5 Twilio Dispatch Broadcast</p>
-                      <p className="text-[10px] text-slate-500">Automatically broadcast emergency SMS alerts to all nearby wardens on Sev 5 logs.</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Automatically broadcast emergency SMS alerts to all nearby wardens on Sev 5 logs.</p>
                     </div>
                   </div>
                   <button 
@@ -771,7 +734,7 @@ export function AdminDashboard() {
                     <Smartphone className="w-5 h-5 text-slate-500 mt-0.5" />
                     <div>
                       <p className="text-xs font-bold">Auto-Call Warden Duplicates</p>
-                      <p className="text-[10px] text-slate-500">Initiate automated voice calls if duplicate flags exceed 3 within the same postal code.</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Initiate automated voice calls if duplicate flags exceed 3 within the same postal code.</p>
                     </div>
                   </div>
                   <button 
@@ -790,7 +753,7 @@ export function AdminDashboard() {
                     <Radio className="w-5 h-5 text-slate-500 mt-0.5" />
                     <div>
                       <p className="text-xs font-bold">Direct API Hook to Civic Crews</p>
-                      <p className="text-[10px] text-slate-500">Instantly relay approved steward packets as JSON payloads directly to crew foreman mobile devices.</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Instantly relay approved steward packets as JSON payloads directly to crew foreman mobile devices.</p>
                     </div>
                   </div>
                   <button 
@@ -809,7 +772,10 @@ export function AdminDashboard() {
                 onClick={handleDeployRules}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xs py-3 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
-                <Check className="w-4 h-4" /> Deploy Rules & Parametric Configuration
+                <div className="flex items-center justify-center gap-2 w-full px-2">
+                  <Check className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-left leading-tight">Deploy Rules & Parametric Configuration</span>
+                </div>
               </button>
             </CardContent>
           </Card>
@@ -843,8 +809,8 @@ export function AdminDashboard() {
                       <p className="text-[10px] text-slate-500 dark:text-slate-400">
                         Ward: <strong className="text-slate-700 dark:text-slate-300">{st.ward}</strong> | Specialty: <strong className="text-slate-700 dark:text-slate-300">{st.category}</strong>
                       </p>
-                      <p className="text-[10px] text-slate-400">
-                        Active Cases: <strong>{st.activeCases}</strong> | Reliable Trust Rating: <strong>{st.trustRating}</strong>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                        Active Cases: <strong className="text-slate-700 dark:text-slate-300">{st.activeCases}</strong> | Reliable Trust Rating: <strong className="text-slate-700 dark:text-slate-300">{st.trustRating}</strong>
                       </p>
                     </div>
 
@@ -860,24 +826,24 @@ export function AdminDashboard() {
 
               {/* Add Steward Form */}
               <form onSubmit={handleAddSteward} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-3 mt-1">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Assign New Steward Portal</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Assign New Steward Portal</span>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-400 uppercase">Steward Name</label>
+                    <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Steward Name</label>
                     <input 
                       type="text" 
                       value={newStewardName}
                       onChange={(e) => setNewStewardName(e.target.value)}
                       placeholder="e.g. Anand Sen"
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none text-slate-900 dark:text-slate-100"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-400 uppercase">Ward Sector</label>
+                    <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Ward Sector</label>
                     <select 
                       value={newStewardWard}
                       onChange={(e) => setNewStewardWard(e.target.value)}
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none text-slate-900 dark:text-slate-100"
                     >
                       <option value="Indiranagar">Indiranagar</option>
                       <option value="Koramangala">Koramangala</option>
@@ -886,11 +852,11 @@ export function AdminDashboard() {
                     </select>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-400 uppercase">Specialty Area</label>
+                    <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Specialty Area</label>
                     <select 
                       value={newStewardCategory}
                       onChange={(e) => setNewStewardCategory(e.target.value)}
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none text-slate-900 dark:text-slate-100"
                     >
                       <option value="Pothole / road damage">Road damage / Pothole</option>
                       <option value="Water leakage">Water leakage</option>
@@ -934,13 +900,13 @@ export function AdminDashboard() {
                     <div className="flex justify-between items-start gap-1">
                       <div className="truncate">
                         <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{d.user}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{d.timestamp} via {d.method}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{d.timestamp} via {d.method}</p>
                       </div>
                       <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 shrink-0">${d.amount.toFixed(2)}</span>
                     </div>
 
                     <div className="flex items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-900 pt-2">
-                      <span className={`text-[9px] font-black uppercase tracking-wider ${d.status.startsWith('Pending') ? 'text-amber-600' : 'text-emerald-600'}`}>
+                      <span className={`text-[9px] font-black uppercase tracking-wider ${d.status.startsWith('Pending') ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                         {d.status}
                       </span>
                       {d.status.startsWith('Pending') && (
@@ -981,9 +947,9 @@ export function AdminDashboard() {
                       <div className="flex justify-between items-center gap-1">
                         <div className="flex items-center gap-2">
                           <span className="font-extrabold text-xs">{fr.user}</span>
-                          <span className="text-[9px] text-slate-400">({fr.location})</span>
+                          <span className="text-[9px] text-slate-500 dark:text-slate-400">({fr.location})</span>
                         </div>
-                        <span className="text-xs font-black text-red-500 bg-red-500/10 px-2 py-0.5 rounded">
+                        <span className="text-xs font-black text-red-500 dark:text-red-400 bg-red-500/10 px-2 py-0.5 rounded">
                           Score: {fr.anomalyScore}%
                         </span>
                       </div>
@@ -993,7 +959,7 @@ export function AdminDashboard() {
                       </p>
 
                       <div className="flex items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-900 pt-2">
-                        <span className={`text-[9px] font-black uppercase tracking-widest ${fr.status === 'Blacklisted' ? 'text-red-600' : 'text-amber-600'}`}>
+                        <span className={`text-[9px] font-black uppercase tracking-widest ${fr.status === 'Blacklisted' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`}>
                           Status: {fr.status}
                         </span>
                         {fr.status === 'Flagged' && (
@@ -1040,14 +1006,14 @@ export function AdminDashboard() {
                     <div>
                       <div className="flex justify-between items-center gap-1">
                         <span className="text-[10px] font-black uppercase text-purple-600 dark:text-purple-400 truncate max-w-[70%]">{msg.sender}</span>
-                        <span className="text-[9px] text-slate-400">{msg.date}</span>
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400">{msg.date}</span>
                       </div>
                       <h4 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-200 mt-1">{msg.subject}</h4>
                       <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal mt-0.5">{msg.snippet}</p>
                     </div>
 
                     <div className="flex justify-between items-center gap-2 border-t border-slate-100 dark:border-slate-900 pt-2 mt-1">
-                      <span className="text-[9px] font-bold text-slate-400">
+                      <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400">
                         {msg.acknowledged ? "Synced with Wards" : "Pending Acknowledge"}
                       </span>
                       <div className="flex gap-1.5 shrink-0">

@@ -113,8 +113,16 @@ export function Login() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'demo@civicpulse.ai' && password === 'pass123') {
-      demoLogin();
+    if (password === 'pass123' && (
+      email === 'demo@civicpulse.ai' || 
+      email === 'rohan@civicpulse.ai' || 
+      email === 'aisha@civicpulse.ai' || 
+      email === 'vikram@civicpulse.ai'
+    )) {
+      const customName = email === 'rohan@civicpulse.ai' ? 'Rohan_99' :
+                         email === 'aisha@civicpulse.ai' ? 'Aisha_K' :
+                         email === 'vikram@civicpulse.ai' ? 'Vikram_X' : 'Demo Citizen';
+      demoLogin(email, customName);
       const mappedRole = selectedRole || 'citizen';
       setRole(mappedRole);
       navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
@@ -137,8 +145,16 @@ export function Login() {
       setError('Please verify your email with OTP first.');
       return;
     }
-    if (email === 'demo@civicpulse.ai' && password === 'pass123') {
-      demoLogin();
+    if (password === 'pass123' && (
+      email === 'demo@civicpulse.ai' || 
+      email === 'rohan@civicpulse.ai' || 
+      email === 'aisha@civicpulse.ai' || 
+      email === 'vikram@civicpulse.ai'
+    )) {
+      const customName = email === 'rohan@civicpulse.ai' ? 'Rohan_99' :
+                         email === 'aisha@civicpulse.ai' ? 'Aisha_K' :
+                         email === 'vikram@civicpulse.ai' ? 'Vikram_X' : 'Demo Citizen';
+      demoLogin(email, customName);
       const mappedRole = selectedRole || 'citizen';
       setRole(mappedRole);
       navigate(mappedRole === 'citizen' ? '/' : '/dashboard');

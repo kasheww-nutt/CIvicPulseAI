@@ -49,11 +49,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
-  const demoLogin = () => {
+  const demoLogin = (customEmail?: string, customName?: string) => {
     setUser({
-      uid: 'demo-user-123',
-      email: 'demo@civicpulse.ai',
-      displayName: 'Demo Citizen',
+      uid: 'demo-user-' + (customName || '123'),
+      email: customEmail || 'demo@civicpulse.ai',
+      displayName: customName || 'Demo Citizen',
       photoURL: null,
       emailVerified: true,
       isAnonymous: false,
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    if (user?.uid === 'demo-user-123') {
+    if (user?.uid && user.uid.startsWith('demo-user-')) {
       setUser(null);
       return;
     }

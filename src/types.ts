@@ -51,6 +51,43 @@ export interface WalletTransaction {
   type: 'earn' | 'redeem';
 }
 
+export interface Steward {
+  id: string;
+  name: string;
+  ward: string;
+  category: string;
+  activeCases: number;
+  trustRating: string;
+  status: string;
+}
+
+export interface FraudAlert {
+  id: string;
+  user: string;
+  reason: string;
+  anomalyScore: number;
+  status: string;
+  location: string;
+}
+
+export interface Disbursal {
+  id: string;
+  user: string;
+  amount: number;
+  method: string;
+  status: string;
+  timestamp: string;
+}
+
+export interface InboxMessage {
+  id: string;
+  sender: string;
+  subject: string;
+  snippet: string;
+  date: string;
+  acknowledged: boolean;
+}
+
 export interface DemoState {
   userRole: 'citizen' | 'steward' | 'admin';
   trustScore: number;
@@ -58,4 +95,17 @@ export interface DemoState {
   walletTransactions: WalletTransaction[];
   location: string | null;
   cases: CivicCase[];
+  
+  // Dynamic admin controls
+  stewards: Steward[];
+  fraudAlerts: FraudAlert[];
+  disbursals: Disbursal[];
+  inboxMessages: InboxMessage[];
+  systemLogs: string[];
+  slaHours: number;
+  rewardMultiplier: number;
+  twilioSmsNotification: boolean;
+  autoNotifyWarden: boolean;
+  directApiHook: boolean;
+  suspendedUsers: string[];
 }
