@@ -14,6 +14,7 @@ interface DemoContextType extends DemoState {
   claimRepair: (id: string) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  redeemWallet: (amount: number, description: string) => void;
 }
 
 const DemoContext = createContext<DemoContextType | undefined>(undefined);
@@ -22,10 +23,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [userRole, setRole] = useState<'citizen' | 'admin'>('citizen');
   const [trustScore, setTrustScore] = useState(148);
-  const [walletBalance, setWalletBalance] = useState(1.25);
+  const [walletBalance, setWalletBalance] = useState(12.50);
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([
-    { id: '1', amount: 0.50, description: 'Verified pothole in Koramangala', timestamp: '2 days ago', type: 'earn' },
-    { id: '2', amount: 0.75, description: 'Bounty: Fixed streetlight near park', timestamp: '1 week ago', type: 'earn' }
+    { id: '1', amount: 11.25, description: 'Bounty: Verified structure damage at Indiranagar Metro', timestamp: '1 day ago', type: 'earn' },
+    { id: '2', amount: 0.50, description: 'Verified pothole in Koramangala', timestamp: '2 days ago', type: 'earn' },
+    { id: '3', amount: 0.75, description: 'Bounty: Fixed streetlight near park', timestamp: '1 week ago', type: 'earn' }
   ]);
   const [location, setLocation] = useState<string | null>(null);
   const [cases, setCases] = useState<CivicCase[]>(mockCases);
@@ -235,9 +237,20 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setTrustScore(prev => prev + 10);
   };
 
+  const redeemWallet = (amount: number, description: string) => {
+    setWalletBalance(prev => Math.max(0, prev - amount));
+    setWalletTransactions(prev => [{
+      id: Math.random().toString(),
+      amount,
+      description,
+      timestamp: 'Just now',
+      type: 'redeem'
+    }, ...prev]);
+  };
+
   return (
     <DemoContext.Provider value={{
-      userRole, trustScore, walletBalance, walletTransactions, location, cases, setRole, setLocation, verifyCase, reportCase, attachEvidence, preparePacket, claimRepair, isDarkMode, toggleDarkMode
+      userRole, trustScore, walletBalance, walletTransactions, location, cases, setRole, setLocation, verifyCase, reportCase, attachEvidence, preparePacket, claimRepair, isDarkMode, toggleDarkMode, redeemWallet
     }}>
       {children}
     </DemoContext.Provider>
