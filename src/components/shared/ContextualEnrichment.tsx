@@ -60,9 +60,9 @@ export function ContextualEnrichment({ category, title, lat = 37.7749, lng = -12
 
   if (data.loading) {
     return (
-      <div className="bg-[#f8f9fc] p-5 rounded-[20px] border border-[#e2e8f0] shadow-sm flex items-center gap-3">
-        <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
-        <span className="text-sm font-medium text-slate-500">Querying open data sources...</span>
+      <div className="bg-[#f8f9fc] dark:bg-slate-900 p-5 rounded-[20px] border border-[#e2e8f0] dark:border-slate-800 shadow-sm flex items-center gap-3">
+        <Loader2 className="w-5 h-5 text-slate-400 dark:text-slate-500 animate-spin" />
+        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Querying open data sources...</span>
       </div>
     );
   }
@@ -72,13 +72,13 @@ export function ContextualEnrichment({ category, title, lat = 37.7749, lng = -12
   }
 
   return (
-    <div className="bg-indigo-50/50 p-5 rounded-[20px] border border-indigo-100 shadow-sm flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-indigo-700 font-bold text-[10px] uppercase tracking-wider">
+    <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-5 rounded-[20px] border border-indigo-100 dark:border-indigo-900/30 shadow-sm flex flex-col gap-2">
+      <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 font-bold text-[10px] uppercase tracking-wider">
         {data.type === 'weather' ? <CloudRain className="w-4 h-4" /> : <Sunset className="w-4 h-4" />}
         Contextual Open-Data Enrichment
       </div>
-      <p className="text-indigo-900 font-bold text-sm leading-relaxed flex items-start gap-2">
-        <Info className="w-4 h-4 shrink-0 mt-0.5 text-indigo-500" />
+      <p className="text-indigo-900 dark:text-indigo-200 font-bold text-sm leading-relaxed flex items-start gap-2">
+        <Info className="w-4 h-4 shrink-0 mt-0.5 text-indigo-500 dark:text-indigo-400" />
         {data.value}
       </p>
     </div>

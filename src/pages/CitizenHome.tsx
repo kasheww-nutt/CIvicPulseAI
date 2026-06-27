@@ -260,7 +260,7 @@ export function CitizenHome() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#f8f9fc] dark:bg-transparent overflow-y-auto font-sans relative w-full overflow-x-hidden">
+    <div className="flex flex-col bg-[#f8f9fc] dark:bg-transparent min-h-screen font-sans relative w-full overflow-x-hidden">
       {/* City Background Image */}
       <div 
         className="absolute top-0 left-0 right-0 h-[280px] pointer-events-none z-0 dark:invert dark:hue-rotate-180 dark:opacity-[0.35] transition-all duration-300" 
@@ -413,10 +413,10 @@ export function CitizenHome() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="px-5 mb-3 mt-3 relative z-10"
+        className="mx-5 px-5 py-4 mb-4 mt-2 relative z-10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border border-white/60 dark:border-slate-800/60 rounded-[24px] shadow-sm"
       >
-        <h1 className="text-[28px] font-bold text-[#0f284b] dark:text-white tracking-tight leading-tight">Hi Citizen!</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-[14px] mt-1">Good Morning ☀️</p>
+        <h1 className="text-[26px] font-black text-[#0f284b] dark:text-white tracking-tight leading-tight">Hi Citizen!</h1>
+        <p className="text-slate-600 dark:text-slate-300 text-[13px] font-medium mt-1">Good Morning ☀️</p>
       </motion.div>
 
       {/* Passive Geofence Drive-by Opportunity */}

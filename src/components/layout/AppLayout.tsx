@@ -102,8 +102,9 @@ export function AppLayout() {
 
         <main className={cn(
           "flex-1 w-full mx-auto",
-          showBottomNav ? "pb-20" : "pb-safe md:pb-0",
-          isCitizenFlow ? "" : "p-4 md:p-8"
+          isCitizenFlow 
+            ? (showBottomNav ? "pt-0 px-0 pb-24" : "pt-0 px-0 pb-6") 
+            : "pt-4 px-4 md:pt-8 md:px-8 pb-20 md:pb-8"
         )}>
           <Outlet />
         </main>
@@ -129,7 +130,7 @@ export function AppLayout() {
             <NavItem to="/profile" icon={<UserCircle />} label={t('nav.profile')} active={location.pathname === '/profile'} />
           </div>
         ) : !isCitizenFlow && (
-          <nav className="fixed bottom-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-around md:hidden z-30 pb-safe h-16">
+          <nav className="fixed bottom-0 left-0 right-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-around md:hidden z-30 pb-safe h-16">
             <NavItem to="/dashboard" icon={<LayoutDashboard />} label={t('nav.dashboard')} active={location.pathname === '/dashboard'} />
             <NavItem to="/" icon={<Home />} label="App Preview" active={location.pathname === '/'} />
           </nav>

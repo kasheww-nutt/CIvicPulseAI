@@ -143,7 +143,7 @@ export function ReportIssue() {
   };
 
   return (
-    <div className="flex flex-col bg-[#f8f9fc] dark:bg-transparent min-h-screen pb-24">
+    <div className="flex flex-col bg-[#f8f9fc] dark:bg-transparent min-h-screen pb-6">
       <header className="bg-white dark:bg-slate-900 px-6 pt-6 pb-4 flex items-center gap-3 sticky top-0 z-10 shadow-sm border-b border-[#e2e8f0] dark:border-slate-800">
          <button onClick={() => step === 1 ? navigate(-1) : setStep(1)} className="p-1 -ml-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
            <ArrowLeft className="w-6 h-6" />
@@ -322,6 +322,18 @@ export function ReportIssue() {
                     <span className="text-xs font-medium text-slate-400">or continue below to create a separate case</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {analysis?.severity === 5 && (
+            <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-[24px] text-xs text-red-950 flex items-start gap-2.5 shadow-sm mt-1 mb-2">
+              <ShieldAlert className="w-4 h-4 shrink-0 text-red-600 mt-0.5 animate-pulse" />
+              <div className="flex flex-col gap-1">
+                <span className="font-bold text-[#991b1b]">AI ESCALATION TRIGGER ARMED</span>
+                <p className="text-slate-700 dark:text-slate-300 leading-normal font-medium">
+                  This report matches <strong>Severity 5/5 Criteria</strong>. Submitting this issue will bypass standard Steward review and instantly fire an Automated Escalation SMS dispatch to city engineers and emergency planners.
+                </p>
               </div>
             </div>
           )}
