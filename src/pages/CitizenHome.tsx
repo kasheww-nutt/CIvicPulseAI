@@ -262,12 +262,15 @@ export function CitizenHome() {
   return (
     <div className="flex flex-col h-full bg-[#f8f9fc] dark:bg-transparent overflow-y-auto font-sans relative w-full overflow-x-hidden">
       {/* City Background Image */}
-      <div className="absolute top-0 left-0 right-0 h-[280px] pointer-events-none z-0" style={{
-        backgroundImage: `url("/top-bg.png")`,
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'top',
-        backgroundSize: '100% auto'
-      }}></div>
+      <div 
+        className="absolute top-0 left-0 right-0 h-[280px] pointer-events-none z-0 dark:invert dark:hue-rotate-180 dark:opacity-[0.35] transition-all duration-300" 
+        style={{
+          backgroundImage: `url("/top-bg.png")`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'top',
+          backgroundSize: '100% auto'
+        }}
+      />
 
       {/* Top Bar matching mockup */}
       <div className="flex items-center justify-between px-4 sm:px-6 pt-10 pb-2 relative z-50">
@@ -412,8 +415,8 @@ export function CitizenHome() {
         transition={{ delay: 0.1 }}
         className="px-5 mb-3 mt-3 relative z-10"
       >
-        <h1 className="text-[28px] font-bold text-[#0f284b] tracking-tight leading-tight">Hi Citizen!</h1>
-        <p className="text-slate-500 text-[14px] mt-1">Good Morning ☀️</p>
+        <h1 className="text-[28px] font-bold text-[#0f284b] dark:text-white tracking-tight leading-tight">Hi Citizen!</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-[14px] mt-1">Good Morning ☀️</p>
       </motion.div>
 
       {/* Passive Geofence Drive-by Opportunity */}
@@ -424,11 +427,11 @@ export function CitizenHome() {
           transition={{ delay: 0.15 }}
           className="px-4 mb-5 relative z-10"
         >
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800/30 rounded-[20px] p-4 flex gap-3 shadow-sm relative overflow-hidden">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900 dark:to-teal-900 border border-emerald-200 dark:border-emerald-700 rounded-[20px] p-4 flex gap-3 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-              <MapPin className="w-24 h-24 text-emerald-900 dark:text-emerald-400" />
+              <MapPin className="w-24 h-24 text-emerald-900 dark:text-emerald-100" />
             </div>
-            <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+            <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-700">
               <span className="animate-ping absolute inline-flex h-10 w-10 rounded-full bg-emerald-400 opacity-20"></span>
               <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400 relative" />
             </div>
@@ -456,7 +459,7 @@ export function CitizenHome() {
         className="px-3 mb-6 relative z-10"
       >
         <div className="relative w-full rounded-[20px] shadow-sm">
-          <img src="/card-bg.png" alt="Report, Track, Improve" className="w-full h-auto block rounded-[20px]" />
+          <img src="/card-bg.png" alt="Report, Track, Improve" className="w-full h-auto block rounded-[20px] dark:brightness-[0.82] transition-all duration-300" />
           <div className="absolute inset-0 p-4 sm:p-5 flex flex-col keep-original-color">
             <div className="max-w-[65%] sm:max-w-[280px]">
               <h2 className="text-[16.5px] sm:text-[18px] font-bold leading-tight mb-1 text-white mt-4 sm:mt-5">Report. Track. Improve your community.</h2>

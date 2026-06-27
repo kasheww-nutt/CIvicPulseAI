@@ -46,10 +46,7 @@ export function AppLayout() {
         {location.pathname !== '/' && (
           <header className="bg-white dark:bg-slate-900 px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-sm border-b border-transparent dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <div className="bg-[#0f284b] dark:bg-blue-600 p-1.5 rounded-lg">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-base tracking-tight text-[#0f284b] dark:text-white">{t('app.title')}</span>
+              <img src="/chatgpt_logo_full.png" alt="Logo" className="h-6 w-auto object-contain dark:brightness-0 dark:invert" />
             </div>
 
             <div className="flex items-center gap-3 relative">
