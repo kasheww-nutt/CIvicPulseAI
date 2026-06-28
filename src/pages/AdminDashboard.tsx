@@ -211,7 +211,7 @@ export function AdminDashboard() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 rounded-[24px]">
+           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[24px]">
              <CardContent className="p-4 md:p-5 flex flex-col gap-1">
                <div className="flex justify-between items-center mb-1">
                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Urgent Verifications</span>
@@ -220,7 +220,7 @@ export function AdminDashboard() {
                <span className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{urgentVerificationNeeded.length}</span>
              </CardContent>
            </Card>
-           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 rounded-[24px]">
+           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[24px]">
              <CardContent className="p-4 md:p-5 flex flex-col gap-1">
                <div className="flex justify-between items-center mb-1">
                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Packets to Prepare</span>
@@ -229,7 +229,7 @@ export function AdminDashboard() {
                <span className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{packetPreparationQueue.length}</span>
              </CardContent>
            </Card>
-           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 rounded-[24px]">
+           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[24px]">
              <CardContent className="p-4 md:p-5 flex flex-col gap-1">
                <div className="flex justify-between items-center mb-1">
                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Duplicate Fusion</span>
@@ -238,7 +238,7 @@ export function AdminDashboard() {
                <span className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{duplicateFusionReview.length}</span>
              </CardContent>
            </Card>
-           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 rounded-[24px]">
+           <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[24px]">
              <CardContent className="p-4 md:p-5 flex flex-col gap-1">
                <div className="flex justify-between items-center mb-1">
                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Closed</span>
@@ -565,7 +565,7 @@ export function AdminDashboard() {
                 <span className="text-xs font-bold text-emerald-500">● Live Synchronization</span>
               </div>
               <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">Sovereign Admin Control Panel</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Control municipal parameters, assign stewards, inspect ledger transactions, direct departmental inbox integration, and run system fraud algorithms.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1 leading-relaxed">Control municipal parameters, assign stewards, inspect ledger transactions, direct departmental inbox integration, and run system fraud algorithms.</p>
             </div>
           </div>
 
@@ -649,11 +649,11 @@ export function AdminDashboard() {
         <div className="lg:col-span-7 flex flex-col gap-6">
           
           {/* Section 1: System Parameters & Twilio Dispatch Sim */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-5">
               <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
                     <Sliders className="w-5 h-5 text-blue-600 dark:text-blue-400" /> System Parameters & Twilio Rules
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Control core response SLAs, financial multiplier gates, and active Twilio dispatch settings.</p>
@@ -723,9 +723,9 @@ export function AdminDashboard() {
                       setTwilioSmsNotification(!twilioSmsNotification);
                       addLog(`Twilio SMS Emergency Gateway toggled ${!twilioSmsNotification ? "ON" : "OFF"}.`);
                     }}
-                    className={`w-11 h-6 rounded-full p-1 transition-colors duration-200 focus:outline-none ${twilioSmsNotification ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    className={`w-6 h-6 rounded flex items-center justify-center shrink-0 transition-colors border ${twilioSmsNotification ? 'bg-blue-600 border-blue-600' : 'border-slate-300 dark:border-slate-600 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                   >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 transform ${twilioSmsNotification ? 'translate-x-5' : 'translate-x-0'}`} />
+                    {twilioSmsNotification && <Check className="w-4 h-4 text-white" />}
                   </button>
                 </div>
 
@@ -742,9 +742,9 @@ export function AdminDashboard() {
                       setAutoNotifyWarden(!autoNotifyWarden);
                       addLog(`Automated Warden duplicate auto-calling gateway toggled ${!autoNotifyWarden ? "ON" : "OFF"}.`);
                     }}
-                    className={`w-11 h-6 rounded-full p-1 transition-colors duration-200 focus:outline-none ${autoNotifyWarden ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    className={`w-6 h-6 rounded flex items-center justify-center shrink-0 transition-colors border ${autoNotifyWarden ? 'bg-blue-600 border-blue-600' : 'border-slate-300 dark:border-slate-600 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                   >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 transform ${autoNotifyWarden ? 'translate-x-5' : 'translate-x-0'}`} />
+                    {autoNotifyWarden && <Check className="w-4 h-4 text-white" />}
                   </button>
                 </div>
 
@@ -761,9 +761,9 @@ export function AdminDashboard() {
                       setDirectApiHook(!directApiHook);
                       addLog(`Direct JSON API foreman dispatch toggled ${!directApiHook ? "ON" : "OFF"}.`);
                     }}
-                    className={`w-11 h-6 rounded-full p-1 transition-colors duration-200 focus:outline-none ${directApiHook ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    className={`w-6 h-6 rounded flex items-center justify-center shrink-0 transition-colors border ${directApiHook ? 'bg-blue-600 border-blue-600' : 'border-slate-300 dark:border-slate-600 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                   >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 transform ${directApiHook ? 'translate-x-5' : 'translate-x-0'}`} />
+                    {directApiHook && <Check className="w-4 h-4 text-white" />}
                   </button>
                 </div>
               </div>
@@ -781,11 +781,11 @@ export function AdminDashboard() {
           </Card>
 
           {/* Section 2: Steward Area Assignments */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
                     <UserPlus className="w-5 h-5 text-purple-600 dark:text-purple-400" /> Steward Hub & Area Assignments
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Approve, monitor, and assign municipal stewards/reviewers to specific operational neighborhoods.</p>
@@ -796,20 +796,20 @@ export function AdminDashboard() {
               {/* Steward assignments list */}
               <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
                 {stewards.map(st => (
-                  <div key={st.id} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center gap-2">
-                    <div className="flex flex-col gap-1 truncate">
+                  <div key={st.id} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center gap-3">
+                    <div className="flex flex-col gap-1 min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-xs">{st.name}</span>
+                        <span className="font-extrabold text-xs truncate">{st.name}</span>
                         {st.status === 'Active' ? (
-                          <span className="text-[8px] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-black uppercase">Active</span>
+                          <span className="text-[8px] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-black uppercase shrink-0">Active</span>
                         ) : (
-                          <span className="text-[8px] bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-1.5 py-0.5 rounded-full font-black uppercase">Revoked</span>
+                          <span className="text-[8px] bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-1.5 py-0.5 rounded-full font-black uppercase shrink-0">Revoked</span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
                         Ward: <strong className="text-slate-700 dark:text-slate-300">{st.ward}</strong> | Specialty: <strong className="text-slate-700 dark:text-slate-300">{st.category}</strong>
                       </p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
                         Active Cases: <strong className="text-slate-700 dark:text-slate-300">{st.activeCases}</strong> | Reliable Trust Rating: <strong className="text-slate-700 dark:text-slate-300">{st.trustRating}</strong>
                       </p>
                     </div>
@@ -827,23 +827,23 @@ export function AdminDashboard() {
               {/* Add Steward Form */}
               <form onSubmit={handleAddSteward} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-3 mt-1">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Assign New Steward Portal</span>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <div className="flex flex-col gap-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Steward Name</label>
                     <input 
                       type="text" 
                       value={newStewardName}
                       onChange={(e) => setNewStewardName(e.target.value)}
                       placeholder="e.g. Anand Sen"
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-900 dark:text-slate-100"
                     />
                   </div>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Ward Sector</label>
                     <select 
                       value={newStewardWard}
                       onChange={(e) => setNewStewardWard(e.target.value)}
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-900 dark:text-slate-100"
                     >
                       <option value="Indiranagar">Indiranagar</option>
                       <option value="Koramangala">Koramangala</option>
@@ -851,12 +851,12 @@ export function AdminDashboard() {
                       <option value="Jayanagar">Jayanagar</option>
                     </select>
                   </div>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Specialty Area</label>
                     <select 
                       value={newStewardCategory}
                       onChange={(e) => setNewStewardCategory(e.target.value)}
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-900 dark:text-slate-100"
                     >
                       <option value="Pothole / road damage">Road damage / Pothole</option>
                       <option value="Water leakage">Water leakage</option>
@@ -867,7 +867,7 @@ export function AdminDashboard() {
                 </div>
                 <button 
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-black text-xs py-2 rounded-xl transition-all self-end px-4 flex items-center gap-1.5 cursor-pointer mt-1"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-black text-xs py-2.5 rounded-xl transition-all self-stretch sm:self-end px-5 flex items-center justify-center gap-1.5 cursor-pointer mt-2"
                 >
                   <UserPlus className="w-3.5 h-3.5" /> Deploy Assigned Steward
                 </button>
@@ -881,11 +881,11 @@ export function AdminDashboard() {
         <div className="lg:col-span-5 flex flex-col gap-6">
           
           {/* Section 3: Ledger & Money Flow Payouts */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
                     <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Money Flow & Ledger
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Authorize or inspect wallet bounties cash-outs from active citizens.</p>
@@ -897,12 +897,12 @@ export function AdminDashboard() {
               <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
                 {disbursals.map(d => (
                   <div key={d.id} className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-2">
-                    <div className="flex justify-between items-start gap-1">
-                      <div className="truncate">
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="min-w-0 flex-1">
                         <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{d.user}</p>
                         <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{d.timestamp} via {d.method}</p>
                       </div>
-                      <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 shrink-0">${d.amount.toFixed(2)}</span>
+                      <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 shrink-0 whitespace-nowrap">${d.amount.toFixed(2)}</span>
                     </div>
 
                     <div className="flex items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-900 pt-2">
@@ -925,11 +925,11 @@ export function AdminDashboard() {
           </Card>
 
           {/* Section 4: AI Fraud Anomaly Tracker */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
                     <AlertOctagon className="w-5 h-5 text-red-600 dark:text-red-400" /> Fraud & Integrity Engine
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Inspect automated triggers and patterns that compromise proof structures.</p>
@@ -944,12 +944,12 @@ export function AdminDashboard() {
                 ) : (
                   fraudAlerts.map(fr => (
                     <div key={fr.id} className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-2">
-                      <div className="flex justify-between items-center gap-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-xs">{fr.user}</span>
-                          <span className="text-[9px] text-slate-500 dark:text-slate-400">({fr.location})</span>
+                      <div className="flex justify-between items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="font-extrabold text-xs truncate">{fr.user}</span>
+                          <span className="text-[9px] text-slate-500 dark:text-slate-400 shrink-0">({fr.location})</span>
                         </div>
-                        <span className="text-xs font-black text-red-500 dark:text-red-400 bg-red-500/10 px-2 py-0.5 rounded">
+                        <span className="text-xs font-black text-red-500 dark:text-red-400 bg-red-500/10 px-2 py-0.5 rounded shrink-0">
                           Score: {fr.anomalyScore}%
                         </span>
                       </div>
@@ -987,11 +987,11 @@ export function AdminDashboard() {
           </Card>
 
           {/* Section 5: Department coordination inbox */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
                     <Building2 className="w-5 h-5 text-purple-600 dark:text-purple-400" /> Municipal Department Inbox
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Integrate requests and priority complaints directly from city departments.</p>
@@ -1002,17 +1002,17 @@ export function AdminDashboard() {
               {/* Department requests list */}
               <div className="flex flex-col gap-2.5 max-h-[260px] overflow-y-auto pr-1">
                 {inboxMessages.map(msg => (
-                  <div key={msg.id} className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-2">
-                    <div>
-                      <div className="flex justify-between items-center gap-1">
-                        <span className="text-[10px] font-black uppercase text-purple-600 dark:text-purple-400 truncate max-w-[70%]">{msg.sender}</span>
-                        <span className="text-[9px] text-slate-500 dark:text-slate-400">{msg.date}</span>
+                  <div key={msg.id} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between items-center gap-2">
+                        <span className="text-[10px] font-black uppercase text-purple-600 dark:text-purple-400 truncate min-w-0 flex-1">{msg.sender}</span>
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400 shrink-0">{msg.date}</span>
                       </div>
-                      <h4 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-200 mt-1">{msg.subject}</h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal mt-0.5">{msg.snippet}</p>
+                      <h4 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-200">{msg.subject}</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">{msg.snippet}</p>
                     </div>
 
-                    <div className="flex justify-between items-center gap-2 border-t border-slate-100 dark:border-slate-900 pt-2 mt-1">
+                    <div className="flex justify-between items-center gap-2 border-t border-slate-100 dark:border-slate-900 pt-3 mt-1">
                       <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400">
                         {msg.acknowledged ? "Synced with Wards" : "Pending Acknowledge"}
                       </span>
