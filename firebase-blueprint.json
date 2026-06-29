@@ -31,6 +31,38 @@
         }
       },
       "required": ["userId", "title", "message", "isRead", "type", "caseId"]
+    },
+    "CivicCase": {
+      "title": "CivicCase",
+      "description": "A civic issue reported by a citizen or analyzed by AI.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "locationLabel": { "type": "string" },
+        "distance": { "type": "string" },
+        "severity": { "type": "number" },
+        "status": { "type": "string" },
+        "age": { "type": "string" },
+        "verificationCount": { "type": "number" },
+        "trustScoreImpact": { "type": "number" },
+        "evidenceQuality": { "type": "string" },
+        "suggestedDepartment": { "type": "string" },
+        "aiSummary": { "type": "string" },
+        "locationSource": { "type": "string" },
+        "duplicateRisk": { "type": "string" },
+        "proofLadderStage": { "type": "number" },
+        "nextBestAction": { "type": "string" },
+        "imagePlaceholder": { "type": "string" },
+        "fixedImagePlaceholder": { "type": "string" },
+        "verifiedUsers": { "type": "array" },
+        "authorId": { "type": "string" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "evidenceLedger": { "type": "array" }
+      },
+      "required": ["id", "title", "category", "locationLabel", "severity", "status"]
     }
   },
   "firestore": {
@@ -39,6 +71,12 @@
         "$ref": "Notification"
       },
       "description": "Stores user notifications."
+    },
+    "cases/{caseId}": {
+      "schema": {
+        "$ref": "CivicCase"
+      },
+      "description": "Stores all civic cases synchronized in real-time."
     }
   }
 }

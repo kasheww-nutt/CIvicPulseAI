@@ -14,7 +14,8 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+  localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()}),
+  ignoreUndefinedProperties: true
 }, "ai-studio-civicpulseai-85d7672b-dd22-4c42-a32e-dd3970a78ff8");
 
 export const googleProvider = new GoogleAuthProvider();

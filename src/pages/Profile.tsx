@@ -1,11 +1,12 @@
 import { useDemo } from '../context/DemoContext';
+import { useAuth } from '../context/AuthContext';
 import { 
   UserCircle, ShieldCheck, TrendingUp, CheckCircle2, History, Settings, ArrowLeft, 
   Wallet, Gift, ArrowDownRight, Landmark, CreditCard, Building, Coffee, Loader2, 
-  Check, Lock, AlertCircle, X, Coins, Smartphone, Sparkles
+  Check, Lock, AlertCircle, X, Coins, Smartphone, Sparkles, Upload, Mail, Key, Image as ImageIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const LOCAL_SHOPS = [
@@ -23,8 +24,126 @@ const PROCESSING_PHASES = [
 
 export function Profile() {
   const { trustScore, userRole, setRole, walletBalance, walletTransactions, redeemWallet } = useDemo();
+  const { user, updateProfileData, updateEmailAddress, updatePasswordValue } = useAuth();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+
+  // Profile Edit states
+  const [tempName, setTempName] = useState(user?.displayName || '');
+  const [tempEmail, setTempEmail] = useState(user?.email || '');
+  const [tempPhoto, setTempPhoto] = useState(user?.photoURL || '');
+  const [tempPassword, setTempPassword] = useState('');
+  const [tempPasswordConfirm, setTempPasswordConfirm] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Sync with current user details when available
+  useEffect(() => {
+    if (user) {
+      setTempName(user.displayName || '');
+      setTempEmail(user.email || '');
+      setTempPhoto(user.photoURL || '');
+    }
+  }, [user]);
+
+  const PRESET_AVATARS = [
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
+    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
+  ];
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        alert("File is too large. Please select an image under 2MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setTempPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert("Please drop a valid image file.");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File is too large. Please select an image under 2MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setTempPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUpdateMessage(null);
+    setIsUpdating(true);
+
+    try {
+      if (!tempName.trim()) {
+        throw new Error("Name cannot be empty.");
+      }
+      if (!tempEmail.trim()) {
+        throw new Error("Email cannot be empty.");
+      }
+
+      // 1. Password check
+      if (tempPassword) {
+        if (tempPassword !== tempPasswordConfirm) {
+          throw new Error("Passwords do not match.");
+        }
+        if (tempPassword.length < 6) {
+          throw new Error("Password must be at least 6 characters.");
+        }
+        await updatePasswordValue(tempPassword);
+      }
+
+      // 2. Email update
+      if (tempEmail !== user?.email) {
+        await updateEmailAddress(tempEmail);
+      }
+
+      // 3. Profile data update (name & photo)
+      await updateProfileData(tempName.trim(), tempPhoto || null);
+
+      setUpdateMessage({ type: 'success', text: 'Account settings updated successfully!' });
+      setTempPassword('');
+      setTempPasswordConfirm('');
+      setTimeout(() => setUpdateMessage(null), 4000);
+    } catch (err: any) {
+      console.error(err);
+      setUpdateMessage({ type: 'error', text: err.message || 'An error occurred while updating settings.' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   // Redeem modal states
   const [showRedeemModal, setShowRedeemModal] = useState(false);
@@ -112,33 +231,228 @@ export function Profile() {
       <div className="p-6 flex flex-col gap-6">
         
         {showSettings && (
-          <div className="bg-white dark:bg-slate-800 p-5 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 shadow-sm flex flex-col gap-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Settings</p>
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Demo Role Switch</label>
-              <div className="flex flex-col gap-2 bg-[#f8f9fc] dark:bg-slate-900 p-1.5 rounded-[20px] border border-[#e2e8f0] dark:border-slate-700">
-                <button 
-                  onClick={() => setRole('citizen')}
-                  className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'citizen' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-                >
-                  Citizen
-                </button>
-                <button 
-                  onClick={() => { setRole('steward'); navigate('/dashboard'); }}
-                  className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'steward' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-                >
-                  Steward
-                </button>
-                <button 
-                  onClick={() => { setRole('admin'); navigate('/dashboard'); }}
-                  className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'admin' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-                >
-                  Admin
-                </button>
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-[#e2e8f0] dark:border-slate-800 shadow-md flex flex-col gap-5">
+            <div className="flex items-center justify-between border-b border-[#e2e8f0] dark:border-slate-800 pb-3">
+              <div className="flex flex-col gap-0.5">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-1.5 tracking-tight">
+                  <Settings className="w-5 h-5 text-blue-500 animate-spin-slow" />
+                  Account Settings
+                </h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Configure your official civic identity</p>
               </div>
+              <button 
+                onClick={() => setShowSettings(false)} 
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
+
+            <form onSubmit={handleSaveSettings} className="flex flex-col gap-4">
+              {/* Photo Upload & Presets Section */}
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <ImageIcon className="w-3.5 h-3.5 text-blue-500" />
+                  Profile Photo & Avatar
+                </label>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-center bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-dashed border-[#e2e8f0] dark:border-slate-800">
+                  {/* Current Temp Avatar preview */}
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden bg-white dark:bg-slate-800 border-2 border-blue-500/20 shrink-0 shadow-sm flex items-center justify-center">
+                    {tempPhoto ? (
+                      <img src={tempPhoto} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <UserCircle className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+                    )}
+                    {tempPhoto && (
+                      <button 
+                        type="button"
+                        onClick={() => setTempPhoto('')}
+                        className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 flex items-center justify-center text-white transition-opacity text-[10px] font-bold"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Drag-and-drop / File Selector Zone */}
+                  <div 
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-3 text-center transition-all cursor-pointer ${
+                      isDragging 
+                        ? 'border-blue-500 bg-blue-50/30 dark:bg-blue-950/20' 
+                        : 'border-[#e2e8f0] dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    <input 
+                      type="file" 
+                      id="avatar-file-upload" 
+                      accept="image/*" 
+                      onChange={handlePhotoUpload} 
+                      className="hidden" 
+                    />
+                    <label htmlFor="avatar-file-upload" className="cursor-pointer flex flex-col items-center gap-1">
+                      <Upload className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Drag & Drop image here</span>
+                      <span className="text-[10px] text-slate-400">or click to browse from device (max 2MB)</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Preset Avatars Selection */}
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <p className="text-[10px] text-slate-400 font-bold">Or select a high-fidelity preset avatar:</p>
+                  <div className="grid grid-cols-6 gap-2 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                    {PRESET_AVATARS.map((url, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setTempPhoto(url)}
+                        className={`aspect-square rounded-full overflow-hidden border-2 transition-all ${
+                          tempPhoto === url 
+                            ? 'border-blue-500 scale-105 shadow-md' 
+                            : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
+                        }`}
+                      >
+                        <img src={url} alt={`Preset ${idx + 1}`} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Name Field */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <UserCircle className="w-3.5 h-3.5 text-blue-500" />
+                  Full Name
+                </label>
+                <input 
+                  type="text" 
+                  required
+                  value={tempName}
+                  onChange={e => setTempName(e.target.value)}
+                  placeholder="Enter your display name"
+                  className="bg-slate-50 dark:bg-slate-950 border border-[#e2e8f0] dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+
+              {/* Email Field */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <Mail className="w-3.5 h-3.5 text-blue-500" />
+                  Email Address
+                </label>
+                <input 
+                  type="email" 
+                  required
+                  value={tempEmail}
+                  onChange={e => setTempEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="bg-slate-50 dark:bg-slate-950 border border-[#e2e8f0] dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+
+              {/* Password Field */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <Key className="w-3.5 h-3.5 text-blue-500" />
+                    New Password (Optional)
+                  </label>
+                  <input 
+                    type="password" 
+                    value={tempPassword}
+                    onChange={e => setTempPassword(e.target.value)}
+                    placeholder="Min 6 characters"
+                    className="bg-slate-50 dark:bg-slate-950 border border-[#e2e8f0] dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <Lock className="w-3.5 h-3.5 text-blue-500" />
+                    Confirm New Password
+                  </label>
+                  <input 
+                    type="password" 
+                    value={tempPasswordConfirm}
+                    onChange={e => setTempPasswordConfirm(e.target.value)}
+                    placeholder="Repeat password"
+                    className="bg-slate-50 dark:bg-slate-950 border border-[#e2e8f0] dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Update Status Message Alert Banner */}
+              <AnimatePresence>
+                {updateMessage && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className={`flex items-start gap-2.5 p-3.5 rounded-xl border ${
+                      updateMessage.type === 'success' 
+                        ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30 text-emerald-800 dark:text-emerald-400' 
+                        : 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-800 dark:text-rose-400'
+                    }`}
+                  >
+                    {updateMessage.type === 'success' ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                    )}
+                    <p className="text-xs font-bold leading-relaxed">{updateMessage.text}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Form submit button */}
+              <button
+                type="submit"
+                disabled={isUpdating}
+                className="w-full bg-[#0f284b] hover:bg-[#1a3f6d] dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-sm text-xs tracking-wide flex items-center justify-center gap-2 active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving Account Settings...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Save Account Settings
+                  </>
+                )}
+              </button>
+            </form>
           </div>
         )}
+
+        {/* User Identity Card */}
+        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-[#e2e8f0] dark:border-slate-800 shadow-sm flex items-center gap-5 relative overflow-hidden">
+          <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-blue-500/20 dark:border-blue-400/20 bg-slate-50 dark:bg-slate-800 shrink-0 shadow-sm flex items-center justify-center">
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt={user.displayName || 'User'} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              <UserCircle className="w-full h-full text-slate-300 dark:text-slate-600 p-1" />
+            )}
+          </div>
+          <div className="flex flex-col min-w-0 flex-1">
+            <h2 className="text-xl font-black text-slate-900 dark:text-white leading-tight truncate">
+              {user?.displayName || 'Demo Citizen'}
+            </h2>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold truncate">
+              {user?.email || 'demo@civicpulse.ai'}
+            </span>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full border border-blue-100 dark:border-blue-900/30">
+                {userRole === 'admin' ? 'Authorized Admin' : userRole === 'steward' ? 'Field Steward' : 'Verified Citizen'}
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Civic Trust Header */}
         <div className="bg-[#0f284b] rounded-[32px] p-6 text-white shadow-sm relative overflow-hidden flex flex-col gap-1">

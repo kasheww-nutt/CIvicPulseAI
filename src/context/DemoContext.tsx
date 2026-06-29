@@ -3,6 +3,62 @@ import { CivicCase, DemoState, WalletTransaction, Steward, FraudAlert, Disbursal
 import { mockCases } from '../data/mock';
 import { useAuth } from './AuthContext';
 import { createNotification } from '../lib/notifications';
+import { collection, onSnapshot, setDoc, doc, deleteDoc } from 'firebase/firestore';
+import { db, auth } from '../lib/firebase';
+
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+  }
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
+
+function cleanUndefined<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(cleanUndefined) as any;
+  }
+  const newObj: any = {};
+  for (const key of Object.keys(obj as any)) {
+    const val = (obj as any)[key];
+    if (val !== undefined) {
+      newObj[key] = cleanUndefined(val);
+    }
+  }
+  return newObj;
+}
 
 interface DemoContextType extends DemoState {
   setRole: (role: 'citizen' | 'steward' | 'admin') => void;
@@ -70,11 +126,6 @@ export function DemoProvider({ children }: { children: ReactNode }) {
 
   // --- PERSISTENT CASES WITH MAPPED FRAUD AUTHORS ---
   const [cases, setCases] = useState<CivicCase[]>(() => {
-    const saved = localStorage.getItem('civic_cases');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    // Set authorId for some cases to map them to fraudAlerts users
     return mockCases.map(c => {
       if (c.id === 'c-004') return { ...c, authorId: 'Rohan_99' };
       if (c.id === 'c-010') return { ...c, authorId: 'Aisha_K' };
@@ -82,6 +133,58 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       return c;
     });
   });
+
+  // Sync with Firestore Real-time database
+  useEffect(() => {
+    const q = collection(db, 'cases');
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      if (snapshot.empty) {
+        console.log('Firestore cases collection is empty. Seeding with mock cases in real-time...');
+        // Seed database
+        const seedPromises = mockCases.map(async (c) => {
+          const caseDocRef = doc(db, 'cases', c.id);
+          let authorId = c.authorId || null;
+          if (c.id === 'c-004') authorId = 'Rohan_99';
+          if (c.id === 'c-010') authorId = 'Aisha_K';
+          if (c.id === 'c-009') authorId = 'Vikram_X';
+
+          const enrichedCase: CivicCase = {
+            ...c,
+            authorId: authorId || undefined,
+            verifiedUsers: c.verifiedUsers || (c.verifiedByMe ? ['system-seed'] : [])
+          };
+          try {
+            await setDoc(caseDocRef, cleanUndefined(enrichedCase));
+          } catch (err) {
+            handleFirestoreError(err, OperationType.WRITE, `cases/${c.id}`);
+          }
+        });
+        await Promise.all(seedPromises);
+      } else {
+        const fetchedCases = snapshot.docs.map(docSnapshot => {
+          const data = docSnapshot.data() as CivicCase;
+          const verifiedByMe = data.verifiedByMe || (user?.uid ? data.verifiedUsers?.includes(user.uid) : false);
+          return {
+            ...data,
+            verifiedByMe
+          };
+        });
+
+        // Sort cases stable order by numeric c-ID
+        fetchedCases.sort((a, b) => {
+          const numA = parseInt(a.id.replace('c-', '')) || 999;
+          const numB = parseInt(b.id.replace('c-', '')) || 999;
+          return numA - numB;
+        });
+
+        setCases(fetchedCases);
+      }
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'cases');
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -174,9 +277,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle('dark', isDarkMode);
   }, [isDarkMode]);
 
-  useEffect(() => {
-    localStorage.setItem('civic_cases', JSON.stringify(cases));
-  }, [cases]);
+  // Local cases cache removed in favor of real-time Firestore synchronization
 
   useEffect(() => {
     localStorage.setItem('civic_stewards', JSON.stringify(stewards));
@@ -310,7 +411,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const actionFraud = (id: string, username: string, action: 'blacklist' | 'dismiss') => {
+  const actionFraud = async (id: string, username: string, action: 'blacklist' | 'dismiss') => {
     if (action === 'blacklist') {
       setFraudAlerts(prev => prev.map(f => f.id === id ? { ...f, status: 'Blacklisted' } : f));
       setSuspendedUsers(prev => {
@@ -321,13 +422,23 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       });
       addSystemLog(`ADMIN ACTION: Blacklisted citizen ${username} and deleted all associated reports due to pattern manipulation alerts.`);
       
-      // CASCADE: Delete all cases submitted by this user completely!
-      setCases(prev => prev.filter(c => c.authorId !== username));
+      // CASCADE: Delete all cases submitted by this user in Firestore!
+      const userCases = cases.filter(c => c.authorId === username);
+      const deletePromises = userCases.map(async (c) => {
+        const caseDocRef = doc(db, 'cases', c.id);
+        try {
+          await deleteDoc(caseDocRef);
+        } catch (err) {
+          handleFirestoreError(err, OperationType.DELETE, `cases/${c.id}`);
+        }
+      });
+      await Promise.all(deletePromises);
     } else {
       setFraudAlerts(prev => prev.filter(f => f.id !== id));
       addSystemLog(`ADMIN ACTION: Dismissed fraud alert for citizen ${username}. No anomaly confirmed.`);
     }
   };
+
 
   const approveDisbursal = (id: string) => {
     setDisbursals(prev => prev.map(d => {
@@ -357,190 +468,218 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const attachEvidence = (id: string, newEvidenceQuality: 'Low' | 'Medium' | 'High') => {
-    setCases(prev => prev.map(c => {
-      if (c.id === id) {
-        setTrustScore(prevScore => prevScore + 8);
-        return {
-          ...c,
-          verificationCount: c.verificationCount + 1,
-          evidenceQuality: newEvidenceQuality === 'High' ? 'High' : c.evidenceQuality === 'High' ? 'High' : 'Medium',
-          duplicateRisk: 'Low',
-          verifiedByMe: true,
-          evidenceLedger: [...(c.evidenceLedger || []), {
-            id: Math.random().toString(),
-            title: 'Clearer Evidence Attached',
-            sourceType: 'Citizen',
-            timestamp: 'Just now',
-            trustImpact: 8,
-            explanation: 'Additional photographic evidence provided.'
-          }]
-        };
+  const attachEvidence = async (id: string, newEvidenceQuality: 'Low' | 'Medium' | 'High') => {
+    const target = cases.find(c => c.id === id);
+    if (target) {
+      setTrustScore(prevScore => prevScore + 8);
+      const verifiedUsers = target.verifiedUsers || [];
+      if (user?.uid && !verifiedUsers.includes(user.uid)) {
+        verifiedUsers.push(user.uid);
       }
-      return c;
-    }));
+      const updatedCase: Partial<CivicCase> = {
+        verificationCount: target.verificationCount + 1,
+        evidenceQuality: newEvidenceQuality === 'High' ? 'High' : target.evidenceQuality === 'High' ? 'High' : 'Medium',
+        duplicateRisk: 'Low',
+        verifiedUsers,
+        evidenceLedger: [...(target.evidenceLedger || []), {
+          id: Math.random().toString(),
+          title: 'Clearer Evidence Attached',
+          sourceType: 'Citizen',
+          timestamp: 'Just now',
+          trustImpact: 8,
+          explanation: 'Additional photographic evidence provided.'
+        }]
+      };
+      const caseDocRef = doc(db, 'cases', id);
+      try {
+        await setDoc(caseDocRef, cleanUndefined(updatedCase), { merge: true });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `cases/${id}`);
+      }
+    }
   };
 
-  const verifyCase = (id: string, actionType: 'verify' | 'duplicate' | 'fixed' | 'location' | 'warden_duplicate' | 'warden_resolve') => {
+  const verifyCase = async (id: string, actionType: 'verify' | 'duplicate' | 'fixed' | 'location' | 'warden_duplicate' | 'warden_resolve') => {
+    const c = cases.find(caseObj => caseObj.id === id);
+    if (!c) return;
+
+    const isVerifiedAlready = c.verifiedByMe;
+    if (isVerifiedAlready && !actionType.startsWith('warden_')) {
+      return;
+    }
+
     let triggeredNotification = false;
-    let targetCase: CivicCase | null = null;
     let notifyCount = 0;
+    let reward = 0;
+    let newStage = c.proofLadderStage;
+    let newStatus = c.status;
+    const newLedger = [...(c.evidenceLedger || [])];
 
-    setCases(prev => prev.map(c => {
-      if (c.id === id && (!c.verifiedByMe || actionType.startsWith('warden_'))) {
-        let reward = 0;
-        let newStage = c.proofLadderStage;
-        let newStatus = c.status;
-        const newLedger = [...(c.evidenceLedger || [])];
-
-        if (actionType === 'verify') {
-          // Multiply reward by our dynamic system parameter multiplier!
-          reward = Math.round(5 * rewardMultiplier);
-          newLedger.push({ id: Math.random().toString(), title: 'Verified by You', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: `You confirmed the issue exists. Dynamic multiplier is ${rewardMultiplier}x.` });
-          if (c.proofLadderStage < 2) {
-            newStage = 2;
-            newStatus = 'Community Verified';
-          } else if (c.proofLadderStage === 2 && c.verificationCount > 5) {
-             newStage = 3;
-             newStatus = 'Authority Ready';
-          }
-          
-          if (c.verificationCount + 1 === 5) {
-             triggeredNotification = true;
-             targetCase = c;
-             notifyCount = 5;
-          } else if (c.verificationCount + 1 === 10) {
-             triggeredNotification = true;
-             targetCase = c;
-             notifyCount = 10;
-          }
-        } else if (actionType === 'duplicate') {
-          reward = Math.round(8 * rewardMultiplier);
-          newLedger.push({ id: Math.random().toString(), title: 'Duplicate Risk Resolved', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Confirmed as a distinct issue.' });
-        } else if (actionType === 'fixed') {
-          reward = Math.round(12 * rewardMultiplier);
-          newStage = 6;
-          newStatus = 'Fix Verified';
-          newLedger.push({ id: Math.random().toString(), title: 'Fix Verified', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Field repair has been verified.' });
-        } else if (actionType === 'location') {
-          reward = Math.round(5 * rewardMultiplier);
-          newLedger.push({ id: Math.random().toString(), title: 'Location Confirmed', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Manual pin location confirmed.' });
-        } else if (actionType === 'warden_duplicate') {
-          reward = Math.round(15 * rewardMultiplier);
-          newStage = 7;
-          newStatus = 'Closed' as any;
-          newLedger.push({ id: Math.random().toString(), title: 'Warden Override: Duplicate', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Area Warden flagged as duplicate.' });
-        } else if (actionType === 'warden_resolve') {
-          reward = Math.round(15 * rewardMultiplier);
-          newStage = 7;
-          newStatus = 'Closed' as any;
-          newLedger.push({ id: Math.random().toString(), title: 'Warden Override: Resolved', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Area Warden marked issue as resolved.' });
-        }
-
-        setTrustScore(prevScore => prevScore + reward);
-        
-        // Handle Bounty Split
-        if (c.bounty && actionType === 'verify') {
-          const splitAmount = c.bounty.amount * 0.5 * rewardMultiplier;
-          setWalletBalance(prev => prev + splitAmount);
-          setWalletTransactions(prev => [{
-            id: Math.random().toString(),
-            amount: splitAmount,
-            description: `Bounty split: Verified ${c.title}`,
-            timestamp: 'Just now',
-            type: 'earn'
-          }, ...prev]);
-        }
-        
-        return {
-          ...c,
-          verificationCount: c.verificationCount + 1,
-          verifiedByMe: true,
-          status: newStatus,
-          proofLadderStage: newStage,
-          locationSource: actionType === 'location' ? 'Device location' : c.locationSource,
-          duplicateRisk: actionType === 'duplicate' ? 'Low' : c.duplicateRisk,
-          evidenceLedger: newLedger
-        };
+    if (actionType === 'verify') {
+      reward = Math.round(5 * rewardMultiplier);
+      newLedger.push({ id: Math.random().toString(), title: 'Verified by You', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: `You confirmed the issue exists. Dynamic multiplier is ${rewardMultiplier}x.` });
+      if (c.proofLadderStage < 2) {
+        newStage = 2;
+        newStatus = 'Community Verified';
+      } else if (c.proofLadderStage === 2 && c.verificationCount > 5) {
+         newStage = 3;
+         newStatus = 'Authority Ready';
       }
-      return c;
-    }));
+      
+      if (c.verificationCount + 1 === 5) {
+         triggeredNotification = true;
+         notifyCount = 5;
+      } else if (c.verificationCount + 1 === 10) {
+         triggeredNotification = true;
+         notifyCount = 10;
+      }
+    } else if (actionType === 'duplicate') {
+      reward = Math.round(8 * rewardMultiplier);
+      newLedger.push({ id: Math.random().toString(), title: 'Duplicate Risk Resolved', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Confirmed as a distinct issue.' });
+    } else if (actionType === 'fixed') {
+      reward = Math.round(12 * rewardMultiplier);
+      newStage = 6;
+      newStatus = 'Fix Verified';
+      newLedger.push({ id: Math.random().toString(), title: 'Fix Verified', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Field repair has been verified.' });
+    } else if (actionType === 'location') {
+      reward = Math.round(5 * rewardMultiplier);
+      newLedger.push({ id: Math.random().toString(), title: 'Location Confirmed', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Manual pin location confirmed.' });
+    } else if (actionType === 'warden_duplicate') {
+      reward = Math.round(15 * rewardMultiplier);
+      newStage = 7;
+      newStatus = 'Closed' as any;
+      newLedger.push({ id: Math.random().toString(), title: 'Warden Override: Duplicate', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Area Warden flagged as duplicate.' });
+    } else if (actionType === 'warden_resolve') {
+      reward = Math.round(15 * rewardMultiplier);
+      newStage = 7;
+      newStatus = 'Closed' as any;
+      newLedger.push({ id: Math.random().toString(), title: 'Warden Override: Resolved', sourceType: 'Citizen', timestamp: 'Just now', trustImpact: reward, explanation: 'Area Warden marked issue as resolved.' });
+    }
 
-    if (triggeredNotification && targetCase && targetCase.authorId) {
-       const uId = user?.uid || targetCase.authorId;
+    setTrustScore(prevScore => prevScore + reward);
+    
+    // Handle Bounty Split
+    if (c.bounty && actionType === 'verify') {
+      const splitAmount = c.bounty.amount * 0.5 * rewardMultiplier;
+      setWalletBalance(prev => prev + splitAmount);
+      setWalletTransactions(prev => [{
+        id: Math.random().toString(),
+        amount: splitAmount,
+        description: `Bounty split: Verified ${c.title}`,
+        timestamp: 'Just now',
+        type: 'earn'
+      }, ...prev]);
+    }
+
+    const verifiedUsers = c.verifiedUsers || [];
+    if (user?.uid && !verifiedUsers.includes(user.uid)) {
+      verifiedUsers.push(user.uid);
+    }
+
+    const updatedFields: Partial<CivicCase> = {
+      verificationCount: c.verificationCount + 1,
+      status: newStatus,
+      proofLadderStage: newStage,
+      locationSource: actionType === 'location' ? 'Device location' : c.locationSource,
+      duplicateRisk: actionType === 'duplicate' ? 'Low' : c.duplicateRisk,
+      evidenceLedger: newLedger,
+      verifiedUsers
+    };
+
+    const caseDocRef = doc(db, 'cases', id);
+    try {
+      await setDoc(caseDocRef, cleanUndefined(updatedFields), { merge: true });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `cases/${id}`);
+    }
+
+    if (triggeredNotification && c.authorId) {
+       const uId = user?.uid || c.authorId;
        createNotification({
          userId: uId,
          title: 'Milestone Reached!',
-         message: `Your report "${targetCase.title}" just reached ${notifyCount} verifications!`,
+         message: `Your report "${c.title}" just reached ${notifyCount} verifications!`,
          isRead: false,
          type: 'verification',
-         caseId: targetCase.id
+         caseId: c.id
        });
     }
   };
 
-  const preparePacket = (id: string) => {
-    setCases(prev => prev.map(c => {
-      if (c.id === id) {
-        return {
-          ...c,
-          status: 'Authority Ready',
-          proofLadderStage: 3,
-          evidenceLedger: [...(c.evidenceLedger || []), {
-            id: Math.random().toString(),
-            title: 'Reviewer Packet Prepared',
-            sourceType: 'Reviewer',
-            timestamp: 'Just now',
-            trustImpact: 0,
-            explanation: 'Escalation packet generated for municipal review.'
-          }]
-        };
+  const preparePacket = async (id: string) => {
+    const target = cases.find(c => c.id === id);
+    if (target) {
+      const updatedFields: Partial<CivicCase> = {
+        status: 'Authority Ready',
+        proofLadderStage: 3,
+        evidenceLedger: [...(target.evidenceLedger || []), {
+          id: Math.random().toString(),
+          title: 'Reviewer Packet Prepared',
+          sourceType: 'Reviewer',
+          timestamp: 'Just now',
+          trustImpact: 0,
+          explanation: 'Escalation packet generated for municipal review.'
+        }]
+      };
+      const caseDocRef = doc(db, 'cases', id);
+      try {
+        await setDoc(caseDocRef, cleanUndefined(updatedFields), { merge: true });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `cases/${id}`);
       }
-      return c;
-    }));
-  };
-
-  const claimRepair = (id: string) => {
-    let triggeredNotification = false;
-    let targetCase: CivicCase | null = null;
-
-    setCases(prev => prev.map(c => {
-      if (c.id === id) {
-        triggeredNotification = true;
-        targetCase = c;
-        return {
-          ...c,
-          status: 'Field repair claimed' as any,
-          proofLadderStage: 4,
-          evidenceLedger: [...(c.evidenceLedger || []), {
-            id: Math.random().toString(),
-            title: 'Field Repair Claimed',
-            sourceType: 'Demo System',
-            timestamp: 'Just now',
-            trustImpact: 0,
-            explanation: 'A repair crew has marked this issue as repaired.'
-          }]
-        };
-      }
-      return c;
-    }));
-
-    if (triggeredNotification && targetCase && targetCase.authorId) {
-       const uId = user?.uid || targetCase.authorId;
-       createNotification({
-         userId: uId,
-         title: 'Action Taken!',
-         message: `Your report "${targetCase.title}" has been claimed for repair by the municipal team.`,
-         isRead: false,
-         type: 'claimed',
-         caseId: targetCase.id
-       });
     }
   };
 
-  const reportCase = (newCase: CivicCase) => {
-    setCases(prev => [newCase, ...prev]);
-    setTrustScore(prev => prev + 10);
+  const claimRepair = async (id: string) => {
+    const target = cases.find(c => c.id === id);
+    if (target) {
+      const updatedFields: Partial<CivicCase> = {
+        status: 'Field repair claimed' as any,
+        proofLadderStage: 4,
+        evidenceLedger: [...(target.evidenceLedger || []), {
+          id: Math.random().toString(),
+          title: 'Field Repair Claimed',
+          sourceType: 'Demo System',
+          timestamp: 'Just now',
+          trustImpact: 0,
+          explanation: 'A repair crew has marked this issue as repaired.'
+        }]
+      };
+      const caseDocRef = doc(db, 'cases', id);
+      try {
+        await setDoc(caseDocRef, cleanUndefined(updatedFields), { merge: true });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `cases/${id}`);
+      }
+
+      if (target.authorId) {
+         const uId = user?.uid || target.authorId;
+         createNotification({
+           userId: uId,
+           title: 'Action Taken!',
+           message: `Your report "${target.title}" has been claimed for repair by the municipal team.`,
+           isRead: false,
+           type: 'claimed',
+           caseId: target.id
+         });
+      }
+    }
+  };
+
+  const reportCase = async (newCase: CivicCase) => {
+    const caseId = newCase.id || `c-${Date.now()}`;
+    const enrichedCase: CivicCase = {
+      ...newCase,
+      id: caseId,
+      verifiedUsers: newCase.verifiedUsers || (newCase.verifiedByMe ? [user?.uid || 'anonymous'] : [])
+    };
+    const caseDocRef = doc(db, 'cases', caseId);
+    try {
+      await setDoc(caseDocRef, cleanUndefined(enrichedCase));
+      setTrustScore(prev => prev + 10);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `cases/${caseId}`);
+    }
   };
 
   const redeemWallet = (amount: number, description: string) => {

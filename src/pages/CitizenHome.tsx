@@ -297,11 +297,31 @@ export function CitizenHome() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[20px] shadow-lg z-[100] overflow-hidden"
+                className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[20px] shadow-lg z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
               >
+                {/* User Info Header block */}
+                <div className="p-3.5 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 flex items-center justify-center bg-white dark:bg-slate-800 shrink-0 shadow-sm">
+                    {user?.photoURL ? (
+                      <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <UserCircle className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                    )}
+                  </div>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-xs font-black text-slate-900 dark:text-white truncate tracking-tight">{user?.displayName || 'Guest Citizen'}</span>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 truncate tracking-wide">{user?.email || 'guest@civicpulse.ai'}</span>
+                  </div>
+                </div>
+
                 <div className="p-2 flex flex-col">
                   <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">
-                    <UserCircle className="w-4 h-4" /> My Profile
+                    {user?.photoURL ? (
+                      <img src={user.photoURL} alt="Avatar" className="w-4 h-4 rounded-full object-cover shrink-0" referrerPolicy="no-referrer" />
+                    ) : (
+                      <UserCircle className="w-4 h-4 shrink-0" />
+                    )}
+                    My Profile
                   </Link>
                   <Link to="/cases" className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">
                     <FileText className="w-4 h-4" /> My Reports

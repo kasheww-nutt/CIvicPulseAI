@@ -75,7 +75,7 @@ function ChangeMapBounds({ coords, defaultCenter }: { coords: [number, number][]
 }
 
 export function Missions() {
-  const { cases, verifyCase } = useDemo();
+  const { cases, verifyCase, location } = useDemo();
   const navigate = useNavigate();
   
   const [destination, setDestination] = useState('');
@@ -95,7 +95,37 @@ export function Missions() {
   const [shouldFetchSuggestions, setShouldFetchSuggestions] = useState(true);
   const [showOnlyRouteMissions, setShowOnlyRouteMissions] = useState(true);
 
-  const startPos: [number, number] = [12.9784, 77.6408]; // Indiranagar, Bangalore
+  const [startPos, setStartPos] = useState<[number, number]>([12.9784, 77.6408]); // Default to Indiranagar, Bangalore
+
+  // Sync starting position with user's set location in context
+  useEffect(() => {
+    if (location) {
+      if (location.startsWith('GPS:')) {
+        const coords = location.replace('GPS:', '').trim().split(',');
+        if (coords.length === 2) {
+          const lat = parseFloat(coords[0]);
+          const lon = parseFloat(coords[1]);
+          if (!isNaN(lat) && !isNaN(lon)) {
+            setStartPos([lat, lon]);
+          }
+        }
+      } else {
+        // Geocode the human-readable location string using Nominatim
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length > 0) {
+              const lat = parseFloat(data[0].lat);
+              const lon = parseFloat(data[0].lon);
+              if (!isNaN(lat) && !isNaN(lon)) {
+                setStartPos([lat, lon]);
+              }
+            }
+          })
+          .catch(err => console.error("Error geocoding current location context:", err));
+      }
+    }
+  }, [location]);
 
   const activeMissions = cases.filter(c => c.status !== 'Resolved' && c.status !== 'Fix Verified').sort((a, b) => {
     let scoreA = a.severity * 10;
@@ -303,8 +333,8 @@ export function Missions() {
 
       <div className="p-4 sm:p-6 flex flex-col gap-6">
         {/* Verification Routes Feature */}
-        <section className="bg-white dark:bg-slate-800 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 shadow-sm overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-3 opacity-10 pointer-events-none">
+        <section className="bg-white dark:bg-slate-800 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 shadow-sm relative">
+          <div className="absolute top-0 right-0 p-3 opacity-10 pointer-events-none overflow-hidden">
             <Navigation2 className="w-24 h-24 text-blue-600" />
           </div>
           <div className="p-5 flex flex-col gap-4 relative z-10">
@@ -340,7 +370,7 @@ export function Missions() {
 
                 {/* Autocomplete Dropdown List */}
                 {suggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-[#e2e8f0] dark:border-slate-800 rounded-xl shadow-lg max-h-60 overflow-y-auto z-40 divide-y divide-slate-100 dark:divide-slate-800">
+                  <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-[#e2e8f0] dark:border-slate-800 rounded-xl shadow-lg max-h-60 overflow-y-auto z-50 divide-y divide-slate-100 dark:divide-slate-800">
                     {suggestions.map((sug, idx) => (
                       <button
                         key={idx}
@@ -367,6 +397,11 @@ export function Missions() {
                 )}
               </button>
             </form>
+
+            <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 bg-[#f8f9fc] dark:bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800 self-start">
+              <MapPin className="w-3.5 h-3.5 text-blue-500 shrink-0 animate-pulse" />
+              <span>Starting from: <strong className="text-slate-800 dark:text-white">{location || 'Indiranagar, Bangalore (Default)'}</strong></span>
+            </div>
 
             {routeError && (
               <div className="text-xs font-semibold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 rounded-xl p-3 flex gap-2">

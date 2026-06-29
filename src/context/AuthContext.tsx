@@ -26,6 +26,9 @@ interface AuthContextType {
   setDbRole: (role: 'citizen' | 'steward' | 'admin') => Promise<void>;
   activePortal: 'citizen' | 'steward' | 'admin' | null;
   setActivePortal: (portal: 'citizen' | 'steward' | 'admin' | null) => void;
+  updateProfileData: (displayName: string, photoURL: string | null) => Promise<void>;
+  updateEmailAddress: (email: string) => Promise<void>;
+  updatePasswordValue: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -127,9 +130,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setDbRoleState(role);
   };
 
+  const updateProfileData = async (displayName: string, photoURL: string | null) => {
+    if (!user) return;
+    if (user.uid.startsWith('demo-user-')) {
+      setUser(prev => prev ? { ...prev, displayName, photoURL } as User : null);
+    } else {
+      const { updateProfile } = await import('firebase/auth');
+      await updateProfile(auth.currentUser!, { displayName, photoURL });
+      await setDoc(doc(db, 'users', user.uid), { displayName, photoURL }, { merge: true });
+      setUser({
+        ...auth.currentUser!,
+        displayName,
+        photoURL
+      } as User);
+    }
+  };
+
+  const updateEmailAddress = async (email: string) => {
+    if (!user) return;
+    if (user.uid.startsWith('demo-user-')) {
+      setUser(prev => prev ? { ...prev, email } as User : null);
+    } else {
+      const { updateEmail } = await import('firebase/auth');
+      await updateEmail(auth.currentUser!, email);
+      await setDoc(doc(db, 'users', user.uid), { email }, { merge: true });
+      setUser({
+        ...auth.currentUser!,
+        email
+      } as User);
+    }
+  };
+
+  const updatePasswordValue = async (password: string) => {
+    if (!user) return;
+    if (user.uid.startsWith('demo-user-')) {
+      // Demo password change
+    } else {
+      const { updatePassword } = await import('firebase/auth');
+      await updatePassword(auth.currentUser!, password);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
-      user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, resetPassword, demoLogin, signOut, language, setLanguage, dbRole, setDbRole, activePortal, setActivePortal
+      user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, resetPassword, demoLogin, signOut, language, setLanguage, dbRole, setDbRole, activePortal, setActivePortal,
+      updateProfileData, updateEmailAddress, updatePasswordValue
     }}>
       {!loading && children}
     </AuthContext.Provider>

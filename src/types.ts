@@ -33,6 +33,7 @@ export interface CivicCase {
   imagePlaceholder?: string;
   fixedImagePlaceholder?: string;
   verifiedByMe?: boolean;
+  verifiedUsers?: string[];
   authorId?: string;
   lat?: number;
   lng?: number;
