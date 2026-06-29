@@ -33,13 +33,12 @@ export function AppLayout() {
   return (
     <div className={cn(
       "min-h-screen bg-slate-100 dark:bg-slate-950 font-sans flex justify-center text-slate-900 dark:text-slate-100",
-      // On desktop, citizen flow looks like a centered phone app, admin looks wide
-      isCitizenFlow ? "" : "bg-slate-50 dark:bg-slate-950"
+      // Always constrain the app to mobile-resolution feel
+      ""
     )}>
       
       <div className={cn(
-        "w-full bg-[#f8f9fc] dark:bg-[#0a0f1c] min-h-screen relative shadow-2xl flex flex-col mx-auto",
-        isCitizenFlow ? "max-w-[430px] border-x border-[#e2e8f0] dark:border-slate-800" : "w-full border-none shadow-none"
+        "w-full max-w-[430px] border-x border-[#e2e8f0] dark:border-slate-800 bg-[#f8f9fc] dark:bg-[#0a0f1c] min-h-screen relative shadow-2xl flex flex-col mx-auto"
       )}>
         
         {/* Top App Bar (Compact Android Style) */}
@@ -110,9 +109,7 @@ export function AppLayout() {
 
         <main className={cn(
           "flex-1 w-full mx-auto",
-          isCitizenFlow 
-            ? (showBottomNav ? "pt-0 px-0 pb-24" : "pt-0 px-0 pb-6") 
-            : "pt-4 px-2 md:pt-6 md:px-4 pb-20 md:pb-8"
+          showBottomNav ? "pt-0 px-0 pb-24" : "pt-0 px-0 pb-20"
         )}>
           <Outlet />
         </main>
@@ -137,8 +134,8 @@ export function AppLayout() {
             <NavItem to="/missions" icon={<MessageCircle />} label={t('nav.missions')} active={location.pathname === '/missions'} />
             <NavItem to="/profile" icon={<UserCircle />} label={t('nav.profile')} active={location.pathname === '/profile'} />
           </div>
-        ) : !isCitizenFlow && (
-          <nav className="fixed bottom-0 left-0 right-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-around md:hidden z-30 pb-safe h-16">
+        ) : (
+          <nav className="fixed bottom-0 left-0 right-0 w-full max-w-[430px] mx-auto bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-around z-30 pb-safe h-16 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.3)]">
             <NavItem to="/dashboard" icon={<LayoutDashboard />} label={t('nav.dashboard')} active={location.pathname === '/dashboard'} />
             <NavItem to="/" icon={<Home />} label="App Preview" active={location.pathname === '/'} />
           </nav>

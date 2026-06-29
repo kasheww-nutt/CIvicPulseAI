@@ -300,9 +300,9 @@ export function CaseDetail() {
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row max-w-5xl mx-auto w-full px-6 lg:px-8 pt-6 gap-6">
+      <div className="flex flex-col max-w-5xl mx-auto w-full px-6 lg:px-8 pt-6 gap-6">
         {/* Left Column: Details */}
-        <div className="w-full lg:w-3/5 flex flex-col gap-6">
+        <div className="w-full flex flex-col gap-6">
           {/* Evidence Photo Banner */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -726,7 +726,7 @@ export function CaseDetail() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="bg-white dark:bg-slate-800 p-5 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 shadow-sm lg:hidden"
+            className="bg-white dark:bg-slate-800 p-5 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 shadow-sm"
           >
             <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-5 uppercase tracking-wider flex items-center gap-2">
               Proof Ladder
@@ -757,60 +757,6 @@ export function CaseDetail() {
 
             {/* Dynamic Action Buttons at end of Section of Ladder */}
             <div className="pt-5 border-t border-[#e2e8f0] dark:border-slate-700">
-              {renderActionButtons()}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Right Column: Ladder (Desktop only) */}
-        <div className="hidden lg:flex w-full lg:w-2/5 flex-col gap-6">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 shadow-sm sticky top-24 animate-none"
-          >
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-wider">
-              Proof Ladder
-            </h3>
-            <ProofLadder caseItem={caseItem} />
-
-            <div className="mt-8 pt-6 border-t border-[#e2e8f0] dark:border-slate-700">
-              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-                Next Best Action
-              </h4>
-              <div className="bg-[#f8f9fc] dark:bg-slate-900 p-4 rounded-[20px] border border-[#e2e8f0] dark:border-slate-700">
-                <p className="text-sm text-slate-800 dark:text-slate-200 font-bold">
-                  {nextBestAction}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-[#e2e8f0] dark:border-slate-700 mb-6">
-              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-                Community Trust
-              </h4>
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2">
-                  {[...Array(Math.min(5, caseItem.verificationCount || 1))].map(
-                    (_, i) => (
-                      <div
-                        key={i}
-                        className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-500 dark:text-slate-300"
-                      >
-                        +
-                      </div>
-                    ),
-                  )}
-                </div>
-                <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                  {caseItem.verificationCount} verifications
-                </div>
-              </div>
-            </div>
-
-            {/* Dynamic Action Buttons at end of Section of Ladder */}
-            <div className="pt-6 border-t border-[#e2e8f0] dark:border-slate-700">
               {renderActionButtons()}
             </div>
           </motion.div>

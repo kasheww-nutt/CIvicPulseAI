@@ -184,7 +184,7 @@ export function EscalationPacket() {
       </div>
 
       <Card className="border border-[#e2e8f0] dark:border-slate-700 rounded-[24px] shadow-sm overflow-hidden bg-white dark:bg-slate-800">
-        <div className="bg-[#f8f9fc] dark:bg-slate-900 border-b border-[#e2e8f0] dark:border-slate-700 px-6 py-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <div className="bg-[#f8f9fc] dark:bg-slate-900 border-b border-[#e2e8f0] dark:border-slate-700 px-6 py-5 flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <Building className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             <div className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Case Reference: #{caseItem.id.toUpperCase()}</div>
@@ -200,7 +200,7 @@ export function EscalationPacket() {
              </div>
            </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-[#e2e8f0] dark:border-slate-700">
+           <div className="flex flex-col gap-6 pt-6 border-t border-[#e2e8f0] dark:border-slate-700">
              <div>
                <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Location Data</h3>
                <p className="text-slate-900 dark:text-white font-bold">{caseItem.locationLabel}</p>
@@ -218,7 +218,7 @@ export function EscalationPacket() {
 
            <div className="pt-6 border-t border-[#e2e8f0] dark:border-slate-700">
              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">Case Analytics</h3>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div className="flex flex-col gap-4">
                <div className="bg-[#f8f9fc] dark:bg-slate-900 p-4 rounded-[20px] border border-[#e2e8f0] dark:border-slate-700">
                  <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Issue DNA Summary</h4>
                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{caseItem.category} - Severity {caseItem.severity}</p>
@@ -276,7 +276,7 @@ export function EscalationPacket() {
 
       {/* Smart Dispatch Command Center */}
       <Card className="border border-[#e2e8f0] dark:border-slate-700 rounded-[24px] shadow-lg overflow-hidden bg-white dark:bg-slate-800 mt-6 mb-6">
-        <div className="bg-[#0f284b] dark:bg-slate-900 text-white px-6 py-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <div className="bg-[#0f284b] dark:bg-slate-900 text-white px-6 py-5 flex flex-col gap-3">
           <div className="flex items-center gap-2.5">
             <div className="relative">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -328,7 +328,7 @@ export function EscalationPacket() {
               Update the location, category, or civic signals below. Watch the briefing hotline script and the official municipal dispatch email draft adapt in real-time!
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-1">
+            <div className="flex flex-col gap-4 mt-1">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Location Label / Name
@@ -429,7 +429,7 @@ export function EscalationPacket() {
           {activeTab === 'email' ? (
             <div className="flex flex-col gap-5">
               {/* Target Lookup Banner */}
-              <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100/60 dark:border-blue-900/30 rounded-[16px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100/60 dark:border-blue-900/30 rounded-[16px] p-4 flex flex-col gap-3">
                 <div>
                   <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">Target Authority Resolved</div>
                   <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{authorityContact.authorityName}</h4>
@@ -446,7 +446,7 @@ export function EscalationPacket() {
                   <span>Live Demo Recipient Email</span>
                   <span className="text-[10px] text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 rounded font-bold">Hackathon Mode</span>
                 </label>
-                <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex flex-col gap-2">
                   <input
                     type="email"
                     value={demoEmail}
@@ -555,7 +555,7 @@ export function EscalationPacket() {
           ) : (
             <div className="flex flex-col gap-5">
               {/* Telephone Contact Banner */}
-              <div className="bg-orange-50/50 dark:bg-orange-950/20 border border-orange-100/60 dark:border-orange-900/30 rounded-[16px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="bg-orange-50/50 dark:bg-orange-950/20 border border-orange-100/60 dark:border-orange-900/30 rounded-[16px] p-4 flex flex-col gap-3">
                 <div>
                   <div className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider mb-1">Direct Helpline Hotline</div>
                   <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{authorityContact.authorityName}</h4>
@@ -614,7 +614,7 @@ export function EscalationPacket() {
         </CardContent>
 
         {/* Footer controls containing PDF print/export as requested */}
-        <div className="bg-[#f8f9fc] dark:bg-slate-900 px-6 py-5 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="bg-[#f8f9fc] dark:bg-slate-900 px-6 py-5 border-t border-slate-200 dark:border-slate-700 flex flex-col gap-4">
           <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 max-w-sm">
             All dispatches are secured using the local region cryptographic signature ledger.
           </p>

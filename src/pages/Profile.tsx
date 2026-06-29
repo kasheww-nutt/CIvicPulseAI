@@ -116,7 +116,7 @@ export function Profile() {
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Settings</p>
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Demo Role Switch</label>
-              <div className="flex flex-col sm:flex-row gap-2 bg-[#f8f9fc] dark:bg-slate-900 p-1.5 rounded-[20px] border border-[#e2e8f0] dark:border-slate-700">
+              <div className="flex flex-col gap-2 bg-[#f8f9fc] dark:bg-slate-900 p-1.5 rounded-[20px] border border-[#e2e8f0] dark:border-slate-700">
                 <button 
                   onClick={() => setRole('citizen')}
                   className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all ${userRole === 'citizen' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-[#e2e8f0] dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDemo } from '../context/DemoContext';
 import { Card, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -188,8 +188,32 @@ export function AdminDashboard() {
   const addLog = addSystemLog;
 
   const [newStewardName, setNewStewardName] = useState("");
-  const [newStewardWard, setNewStewardWard] = useState("Indiranagar");
+  const [newStewardWard, setNewStewardWard] = useState("");
   const [newStewardCategory, setNewStewardCategory] = useState("Pothole / road damage");
+
+  const [wardSuggestions, setWardSuggestions] = useState<any[]>([]);
+  const [isWardSearching, setIsWardSearching] = useState(false);
+  const [showWardSuggestions, setShowWardSuggestions] = useState(false);
+
+  useEffect(() => {
+    if (newStewardWard.length > 2 && showWardSuggestions) {
+      const delayFn = setTimeout(async () => {
+        setIsWardSearching(true);
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(newStewardWard)}&limit=5`);
+          const data = await res.json();
+          setWardSuggestions(data);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsWardSearching(false);
+        }
+      }, 500);
+      return () => clearTimeout(delayFn);
+    } else {
+      setWardSuggestions([]);
+    }
+  }, [newStewardWard, showWardSuggestions]);
 
   const handleAddSteward = (e: React.FormEvent) => {
     e.preventDefault();
@@ -263,7 +287,7 @@ export function AdminDashboard() {
                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Steward overview of priority issues and community verification signals.</p>
                </div>
             </div>
-            <div className="hidden md:flex text-sm font-bold text-emerald-600 dark:text-emerald-400 items-center gap-2 bg-emerald-50 dark:bg-emerald-950/30 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-800/30">
+            <div className="hidden text-sm font-bold text-emerald-600 dark:text-emerald-400 items-center gap-2 bg-emerald-50 dark:bg-emerald-950/30 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-800/30">
                <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
@@ -274,7 +298,7 @@ export function AdminDashboard() {
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4">
            <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[24px]">
              <CardContent className="p-4 md:p-5 flex flex-col gap-1">
                <div className="flex justify-between items-center mb-1">
@@ -313,7 +337,7 @@ export function AdminDashboard() {
            </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
            {/* Verification Queue */}
            <section className="flex flex-col gap-4">
              <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
@@ -353,7 +377,7 @@ export function AdminDashboard() {
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#0f284b] dark:text-blue-400 bg-[#f8f9fc] dark:bg-slate-900 border border-[#e2e8f0] dark:border-slate-700 px-2 py-1 rounded-full shrink-0">Community Verified</span>
                     </div>
                     <h3 className="font-bold text-slate-900 dark:text-slate-100 leading-snug">{c.title}</h3>
-                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 flex flex-col justify-between gap-2">
                       <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-full border border-emerald-100 dark:border-emerald-800/30 w-fit font-bold"><CheckCircle2 className="w-3.5 h-3.5"/> Verified by {c.verificationCount} citizens</span>
                       <span className="text-[#0f284b] dark:text-blue-400 font-bold hover:underline">Prepare Packet &rarr;</span>
                     </div>
@@ -368,7 +392,7 @@ export function AdminDashboard() {
            </section>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div className="flex flex-col gap-6 mt-6">
            {/* Fix Verification Queue */}
            <section className="flex flex-col gap-4">
              <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
@@ -425,7 +449,7 @@ export function AdminDashboard() {
         <section className="bg-slate-900 text-white rounded-[32px] p-6 md:p-8 border border-slate-800 shadow-xl mt-6 flex flex-col gap-6 relative overflow-hidden">
           <div className="absolute right-0 bottom-0 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
           
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6 relative z-10">
+          <div className="flex flex-col justify-between gap-4 border-b border-slate-800 pb-6 relative z-10">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-blue-500/15 text-blue-400 flex items-center justify-center border border-blue-500/30">
                 <FileSpreadsheet className="w-6 h-6 animate-pulse" />
@@ -441,8 +465,8 @@ export function AdminDashboard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
-            <div className="lg:col-span-5 flex flex-col gap-5">
+          <div className="flex flex-col gap-8 relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Operation Overview</span>
                 <p className="text-sm text-slate-300 leading-relaxed font-medium">
@@ -494,7 +518,7 @@ export function AdminDashboard() {
               </div>
             </div>
 
-            <div className="lg:col-span-7 flex flex-col gap-4">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Live Executive Digest Preview</span>
                 <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Sync Active</span>
@@ -628,7 +652,7 @@ export function AdminDashboard() {
             </span>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8 md:gap-10">
+          <div className="flex flex-col gap-8">
             {/* Left Column */}
             <div className="flex-1 flex flex-col gap-5 sm:gap-6">
               <div className="flex items-center gap-4 sm:gap-6">
@@ -646,10 +670,10 @@ export function AdminDashboard() {
             </div>
 
             {/* Vertical Divider (Desktop only) */}
-            <div className="hidden md:block w-px bg-slate-100 dark:bg-slate-800/60" />
+            <div className="hidden w-px bg-slate-100 dark:bg-slate-800/60" />
 
             {/* Right Column (Cards) */}
-            <div className="flex flex-col gap-4 md:w-[320px] shrink-0">
+            <div className="flex flex-col gap-4 shrink-0">
               <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-5 shadow-sm">
                 <div className="w-12 h-12 rounded-full bg-blue-50/80 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
                   <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -719,7 +743,7 @@ export function AdminDashboard() {
       {adminTab === 'operations' ? (
         <>
           {/* Top Level Key-Metrics Overview */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] p-5 shadow-sm flex flex-col gap-1">
           <div className="flex justify-between items-center text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-black uppercase tracking-wider">Registered Stewards</span>
@@ -794,10 +818,10 @@ export function AdminDashboard() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="flex flex-col gap-6">
         
         {/* LEFT COLUMN: Parametric Slider Settings & Steward Assignments (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           
           {/* Section 1: System Parameters & Twilio Dispatch Sim */}
           <Card className="rounded-[32px] border-l-[6px] border-l-blue-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
@@ -822,7 +846,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Sliders */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     <span>SLA Response Target</span>
@@ -996,7 +1020,7 @@ export function AdminDashboard() {
               {/* Add Steward Form */}
               <form onSubmit={handleAddSteward} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-3 mt-1">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Assign New Steward Portal</span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex flex-col gap-3">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Steward Name</label>
                     <input 
@@ -1007,18 +1031,38 @@ export function AdminDashboard() {
                       className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-900 dark:text-slate-100"
                     />
                   </div>
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5 relative">
                     <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Ward Sector</label>
-                    <select 
+                    <input 
+                      type="text" 
                       value={newStewardWard}
-                      onChange={(e) => setNewStewardWard(e.target.value)}
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-900 dark:text-slate-100"
-                    >
-                      <option value="Indiranagar">Indiranagar</option>
-                      <option value="Koramangala">Koramangala</option>
-                      <option value="Whitefield">Whitefield</option>
-                      <option value="Jayanagar">Jayanagar</option>
-                    </select>
+                      onChange={(e) => { setNewStewardWard(e.target.value); setShowWardSuggestions(true); }}
+                      placeholder="Search location (e.g. Indiranagar)"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-900 dark:text-slate-100 w-full"
+                      autoComplete="off"
+                    />
+                    {isWardSearching && showWardSuggestions && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 p-2 text-xs text-slate-500 text-center">
+                        Searching...
+                      </div>
+                    )}
+                    {showWardSuggestions && wardSuggestions.length > 0 && !isWardSearching && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                        {wardSuggestions.map((sug, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => {
+                              setNewStewardWard(sug.display_name.split(',')[0]);
+                              setShowWardSuggestions(false);
+                            }}
+                            className="w-full text-left px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-700 last:border-0 truncate"
+                          >
+                            {sug.display_name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Specialty Area</label>
@@ -1047,7 +1091,7 @@ export function AdminDashboard() {
         </div>
 
         {/* RIGHT COLUMN: Money Flow, Fraud, and Department Inboxes (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           
           {/* Section 3: Ledger & Money Flow Payouts */}
           <Card className="rounded-[32px] border-l-[6px] border-l-emerald-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
@@ -1243,7 +1287,7 @@ export function AdminDashboard() {
       ) : (
         <div className="flex flex-col gap-6 w-full animate-in fade-in zoom-in-95 duration-300">
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             <Card className="rounded-[24px] border-t-[4px] border-t-purple-500 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
               <CardContent className="p-5 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
