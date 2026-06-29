@@ -33,7 +33,7 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | React.ReactNode>('');
   
   // Sign up states
   const [otp, setOtp] = useState('');
@@ -113,27 +113,43 @@ export function Login() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'pass123' && (
-      email === 'demo@civicpulse.ai' || 
-      email === 'rohan@civicpulse.ai' || 
-      email === 'aisha@civicpulse.ai' || 
-      email === 'vikram@civicpulse.ai'
-    )) {
-      const customName = email === 'rohan@civicpulse.ai' ? 'Rohan_99' :
-                         email === 'aisha@civicpulse.ai' ? 'Aisha_K' :
-                         email === 'vikram@civicpulse.ai' ? 'Vikram_X' : 'Demo Citizen';
-      demoLogin(email, customName);
-      const mappedRole = selectedRole || 'citizen';
-      setRole(mappedRole);
-      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
+    
+    if (password === 'pass123') {
+      let targetRole: 'citizen' | 'steward' | 'admin' | null = null;
+      if (email === 'admin@civicpulse.ai') targetRole = 'admin';
+      else if (email === 'steward@civicpulse.ai') targetRole = 'steward';
+      else if (email === 'demo@civicpulse.ai') targetRole = 'citizen';
+
+      if (!targetRole) {
+        setError('Invalid demo credentials.');
+        return;
+      }
+
+      if (selectedRole !== targetRole) {
+        setError(
+          <>
+            Invalid for this role. You belong in the {targetRole} portal.{' '}
+            <button
+              type="button"
+              onClick={() => { setError(''); setSelectedRole(targetRole as any); }}
+              className="mt-1 font-bold underline text-red-700 dark:text-red-300 block hover:text-red-800"
+            >
+              Go to {targetRole} portal
+            </button>
+          </>
+        );
+        return;
+      }
+
+      if (targetRole === 'admin') demoLogin('admin@civicpulse.ai', 'Demo Admin', 'admin');
+      else if (targetRole === 'steward') demoLogin('steward@civicpulse.ai', 'Demo Steward', 'steward');
+      else demoLogin('demo@civicpulse.ai', 'Demo Citizen', 'citizen');
       return;
     }
-    
+
     try {
       await signInWithEmail(email, password);
-      const mappedRole = selectedRole || 'citizen';
-      setRole(mappedRole);
-      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
+      // Navigation is handled by useEffect on user/dbRole
     } catch (err: any) {
       setError(getErrorMessage(err));
     }
@@ -145,27 +161,9 @@ export function Login() {
       setError('Please verify your email with OTP first.');
       return;
     }
-    if (password === 'pass123' && (
-      email === 'demo@civicpulse.ai' || 
-      email === 'rohan@civicpulse.ai' || 
-      email === 'aisha@civicpulse.ai' || 
-      email === 'vikram@civicpulse.ai'
-    )) {
-      const customName = email === 'rohan@civicpulse.ai' ? 'Rohan_99' :
-                         email === 'aisha@civicpulse.ai' ? 'Aisha_K' :
-                         email === 'vikram@civicpulse.ai' ? 'Vikram_X' : 'Demo Citizen';
-      demoLogin(email, customName);
-      const mappedRole = selectedRole || 'citizen';
-      setRole(mappedRole);
-      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
-      return;
-    }
     
     try {
       await signUpWithEmail(email, password);
-      const mappedRole = selectedRole || 'citizen';
-      setRole(mappedRole);
-      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
     } catch (err: any) {
       setError(getErrorMessage(err));
     }
@@ -174,9 +172,6 @@ export function Login() {
   const handleGoogleLogin = async () => {
     try {
       await signInWithGoogle();
-      const mappedRole = selectedRole || 'citizen';
-      setRole(mappedRole);
-      navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
     } catch (err: any) {
       setError(getErrorMessage(err));
     }
@@ -184,10 +179,31 @@ export function Login() {
 
   const handleGuestLogin = () => {
     demoLogin();
-    const mappedRole = selectedRole || 'citizen';
-    setRole(mappedRole);
-    navigate(mappedRole === 'citizen' ? '/' : '/dashboard');
   };
+
+  // Listen for login and route based on role
+  const { user, dbRole, signOut } = useAuth();
+  useEffect(() => {
+    if (user && dbRole) {
+      if (selectedRole && selectedRole !== dbRole) {
+        setError(
+          <>
+            Invalid for this role. You belong in the {dbRole} portal.{' '}
+            <button
+              type="button"
+              onClick={() => { setError(''); setSelectedRole(dbRole as any); signOut(); }}
+              className="mt-1 font-bold underline text-red-700 dark:text-red-300 block hover:text-red-800"
+            >
+              Go to {dbRole} portal
+            </button>
+          </>
+        );
+        signOut();
+        return;
+      }
+      navigate(dbRole === 'citizen' ? '/' : '/dashboard');
+    }
+  }, [user, dbRole, navigate, selectedRole, signOut]);
 
   const resetForm = () => {
     setError('');

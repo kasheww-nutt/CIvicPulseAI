@@ -37,11 +37,35 @@ async function startServer() {
     }, 10 * 60 * 1000);
 
     try {
+      const htmlContent = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+          <div style="background-color: #0f284b; color: #ffffff; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+            <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">CIVICPULSE AI</h2>
+            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.85; font-weight: 600; text-transform: uppercase;">Identity Verification</p>
+          </div>
+          
+          <div style="padding: 32px 20px; color: #1e293b; text-align: center;">
+            <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #0f284b;">Your Verification Code</h3>
+            <p style="margin: 0 0 24px 0; font-size: 14px; color: #475569;">Please use the following 6-digit code to verify your email address. This code will expire in 10 minutes.</p>
+            
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; display: inline-block; margin-bottom: 24px;">
+              <span style="font-family: monospace; font-size: 32px; font-weight: 800; letter-spacing: 4px; color: #3b82f6;">${otp}</span>
+            </div>
+            
+            <p style="margin: 0; font-size: 13px; color: #64748b; font-style: italic;">If you didn't request this code, you can safely ignore this email.</p>
+          </div>
+
+          <div style="background-color: #f1f5f9; padding: 16px; border-radius: 0 0 8px 8px; text-align: center; font-size: 11px; color: #64748b;">
+            <p style="margin: 0; font-weight: 600;">CivicPulse AI • Decentralized Crowdsourced Municipal Validation</p>
+          </div>
+        </div>
+      `;
+
       const { data, error } = await resend.emails.send({
-        from: "CivicPulse AI <onboarding@resend.dev>", // using generic resend sender since no verified domain
+        from: "CivicPulse AI <onboarding@kashewwnutt.tech>",
         to: email,
         subject: "Your CivicPulse AI Verification Code",
-        html: `<p>Your verification code is: <strong>${otp}</strong></p><p>This code will expire in 10 minutes.</p>`,
+        html: htmlContent,
       });
 
       if (error) {
@@ -153,7 +177,7 @@ async function startServer() {
 
     try {
       const { data, error } = await resend.emails.send({
-        from: "CivicPulse AI <onboarding@resend.dev>",
+        from: "CivicPulse AI <onboarding@kashewwnutt.tech>",
         to: email,
         subject: `[CP-DISPATCH] Verified ${category} - Severity ${severity} at ${locationLabel}`,
         html: htmlContent,
@@ -390,7 +414,7 @@ async function startServer() {
 
     try {
       const { data, error } = await resend.emails.send({
-        from: "CivicPulse AI <onboarding@resend.dev>",
+        from: "CivicPulse AI <onboarding@kashewwnutt.tech>",
         to: recipientEmail,
         subject: `[CP-MUNICIPAL-EXPORT] City Planning AI Insight Report`,
         html: htmlContent,

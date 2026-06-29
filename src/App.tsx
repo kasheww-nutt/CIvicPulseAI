@@ -23,9 +23,19 @@ import React from 'react';
 
 // A helper to redirect logged-in users away from auth pages
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, dbRole } = useAuth();
+  
+  // Wait until we know for sure what their role is before deciding where to route them.
+  // if loading is true, we haven't even fetched the user yet.
   if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
+  
+  // If we have a user but no dbRole yet, wait. (AuthContext fetches dbRole asynchronously after setting user).
+  if (user && !dbRole) return null;
+  
+  if (user && dbRole) {
+    return <Navigate to={dbRole === 'citizen' ? '/' : '/dashboard'} replace />;
+  }
+  
   return children;
 }
 
@@ -35,9 +45,7 @@ export default function App() {
       <DemoProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={
-              <PublicRoute><Login /></PublicRoute>
-            } />
+            <Route path="/login" element={<Login />} />
             <Route path="/signup" element={
               <PublicRoute><Signup /></PublicRoute>
             } />

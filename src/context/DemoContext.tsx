@@ -33,8 +33,39 @@ interface DemoContextType extends DemoState {
 const DemoContext = createContext<DemoContextType | undefined>(undefined);
 
 export function DemoProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
-  const [userRole, setRole] = useState<'citizen' | 'steward' | 'admin'>('citizen');
+  const { user, dbRole } = useAuth();
+  const [currentView, setCurrentView] = useState<'citizen' | 'steward' | 'admin'>('citizen');
+  
+  useEffect(() => {
+    // Only auto-set the view if the user is logging in initially and hasn't explicitly chosen a role.
+    // Or, actually, let's only set it if the currentView is not allowed by the new dbRole.
+    if (dbRole) {
+      setCurrentView(prevView => {
+        if (dbRole === 'citizen') return 'citizen';
+        if (dbRole === 'steward' && prevView === 'admin') return 'steward';
+        if (dbRole === 'steward' && prevView === 'citizen') return 'steward';
+        // If admin, they can be anything, so keep prevView if they've explicitly set it, 
+        // but default to admin if they just logged in and were 'citizen' by default.
+        if (dbRole === 'admin' && prevView === 'citizen') return 'admin';
+        return prevView;
+      });
+    }
+  }, [dbRole]);
+
+  const userRole = currentView;
+  
+  const setRole = (role: 'citizen' | 'steward' | 'admin') => {
+    if (dbRole === 'admin') {
+      setCurrentView(role);
+    } else if (dbRole === 'steward' && (role === 'steward' || role === 'citizen')) {
+      setCurrentView(role);
+    } else if (dbRole === 'citizen' && role === 'citizen') {
+      setCurrentView(role);
+    } else {
+      alert("Access Denied: Your account does not have permission for this role. An admin must upgrade your account.");
+    }
+  };
+  
   const [trustScore, setTrustScore] = useState(148);
   const [walletBalance, setWalletBalance] = useState(12.50);
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([

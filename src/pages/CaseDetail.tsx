@@ -238,7 +238,7 @@ export function CaseDetail() {
           </button>
         )}
 
-        {userRole === "admin" && (
+        {(userRole === "admin" || userRole === "steward") && (
           <>
             {canPreparePacket(caseItem) && (
               <button
@@ -459,18 +459,18 @@ export function CaseDetail() {
                     </p>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2">
                     <input
                       type="text"
                       placeholder="e.g. +14155552671"
-                      className="flex-1 border border-slate-200 dark:border-slate-700 bg-transparent rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-white"
+                      className="w-full border border-slate-200 dark:border-slate-700 bg-transparent rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-white"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                     />
                     <button
                       onClick={handleDispatchSMS}
                       disabled={smsLoading}
-                      className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition-colors disabled:opacity-70 flex items-center gap-1.5 cursor-pointer shrink-0"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition-colors disabled:opacity-70 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       {smsLoading ? "Escalating..." : "Dispatch SMS"}
                     </button>
@@ -544,18 +544,18 @@ export function CaseDetail() {
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
                         <input
                           type="text"
                           placeholder="e.g. +14155552671"
-                          className="flex-1 border border-slate-200 dark:border-slate-700 bg-transparent rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#0f284b] dark:text-white"
+                          className="w-full border border-slate-200 dark:border-slate-700 bg-transparent rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#0f284b] dark:text-white"
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value)}
                         />
                         <button
                           onClick={handleDispatchSMS}
                           disabled={smsLoading}
-                          className="bg-[#0f284b] dark:bg-slate-800 hover:bg-[#1a365d] dark:hover:bg-slate-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition-colors disabled:opacity-70 flex items-center gap-1.5 cursor-pointer shrink-0"
+                          className="w-full bg-[#0f284b] dark:bg-slate-800 hover:bg-[#1a365d] dark:hover:bg-slate-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition-colors disabled:opacity-70 flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           {smsLoading ? "Escalating..." : "Dispatch SMS"}
                         </button>

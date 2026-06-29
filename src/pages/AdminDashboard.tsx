@@ -446,7 +446,7 @@ export function AdminDashboard() {
         </div>
 
         {/* City Official Insight Export Engine */}
-        <section className="bg-slate-900 text-white rounded-[32px] p-6 md:p-8 border border-slate-800 shadow-xl mt-6 flex flex-col gap-6 relative overflow-hidden">
+        <section className="bg-slate-900 text-white rounded-[32px] p-4 sm:p-6 md:p-8 border border-slate-800 shadow-xl mt-6 flex flex-col gap-6 relative overflow-hidden">
           <div className="absolute right-0 bottom-0 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
           
           <div className="flex flex-col justify-between gap-4 border-b border-slate-800 pb-6 relative z-10">
@@ -551,7 +551,7 @@ export function AdminDashboard() {
                   </button>
                 </div>
               ) : (
-                <div className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
+                <div className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-3 sm:p-4 md:p-5 flex flex-col gap-4">
                   <div className="grid grid-cols-3 gap-3 text-center border-b border-slate-900 pb-4">
                     <div className="flex flex-col bg-slate-900/50 p-2.5 rounded-xl border border-slate-900">
                       <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total Reports</span>
@@ -581,8 +581,8 @@ export function AdminDashboard() {
 
                   <div className="flex flex-col gap-2.5">
                     <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Geographic Cluster Rankings</span>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-slate-900/30 p-3 rounded-xl border border-slate-900/80 flex flex-col gap-1.5">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <div className="bg-slate-900/30 p-2 sm:p-3 rounded-xl border border-slate-900/80 flex flex-col gap-1.5">
                         <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Neighborhood Densities</span>
                         <div className="flex flex-col gap-1 text-[11px] font-semibold text-slate-300">
                           {Object.entries(
@@ -596,14 +596,14 @@ export function AdminDashboard() {
                           .slice(0, 3)
                           .map(([neigh, count], index) => (
                             <div key={neigh} className="flex justify-between items-center border-b border-slate-900/40 pb-0.5">
-                              <span className="truncate max-w-[120px] text-slate-400">{index + 1}. {neigh}</span>
-                              <span className="text-red-400 font-bold">{count} cases</span>
+                              <span className="truncate flex-1 mr-1 text-slate-400">{index + 1}. {neigh}</span>
+                              <span className="text-red-400 font-bold shrink-0">{count} cases</span>
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      <div className="bg-slate-900/30 p-3 rounded-xl border border-slate-900/80 flex flex-col gap-1.5">
+                      <div className="bg-slate-900/30 p-2 sm:p-3 rounded-xl border border-slate-900/80 flex flex-col gap-1.5">
                         <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Budget Allocation Priority</span>
                         <div className="flex flex-col gap-1 text-[11px] font-semibold text-slate-300">
                           {Object.entries(
@@ -617,8 +617,8 @@ export function AdminDashboard() {
                           .slice(0, 3)
                           .map(([cat, count], index) => (
                             <div key={cat} className="flex justify-between items-center border-b border-slate-900/40 pb-0.5">
-                              <span className="truncate max-w-[110px] text-slate-400">{index + 1}. {cat}</span>
-                              <span className="text-blue-400 font-bold">{count} items</span>
+                              <span className="truncate flex-1 mr-1 text-slate-400">{index + 1}. {cat}</span>
+                              <span className="text-blue-400 font-bold shrink-0">{count} items</span>
                             </div>
                           ))}
                         </div>

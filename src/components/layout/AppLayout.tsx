@@ -8,14 +8,19 @@ import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../lib/i18n';
 import { NotificationBell } from '../shared/NotificationBell';
 import { GeofenceWatcher } from '../shared/GeofenceWatcher';
+import { RoleAuthModal } from '../shared/RoleAuthModal';
 
 export function AppLayout() {
   const { userRole, trustScore, setRole, isDarkMode, toggleDarkMode } = useDemo();
-  const { signOut, language } = useAuth();
+  const { signOut, language, dbRole, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [authModalRole, setAuthModalRole] = useState<'steward' | 'admin' | null>(null);
   const t = useTranslation(language);
+
+  const canBeAdmin = dbRole === 'admin';
+  const canBeSteward = dbRole === 'admin' || dbRole === 'steward';
 
   // Determine if we should constrain width for a mobile-first feel
   const isCitizenFlow = userRole === 'citizen' && !location.pathname.startsWith('/dashboard');
@@ -82,13 +87,29 @@ export function AppLayout() {
                   </button>
                   <button 
                     className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={() => { setRole('steward'); setShowProfileMenu(false); navigate('/dashboard'); }}
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      if (canBeSteward) {
+                        setRole('steward');
+                        navigate('/dashboard');
+                      } else {
+                        setAuthModalRole('steward');
+                      }
+                    }}
                   >
                     Switch to Steward
                   </button>
                   <button 
                     className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={() => { setRole('admin'); setShowProfileMenu(false); navigate('/dashboard'); }}
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      if (canBeAdmin) {
+                        setRole('admin');
+                        navigate('/dashboard');
+                      } else {
+                        setAuthModalRole('admin');
+                      }
+                    }}
                   >
                     Switch to Admin
                   </button>
@@ -144,6 +165,11 @@ export function AppLayout() {
         <TrustScoreReward score={trustScore} />
         <GeofenceWatcher />
 
+        <RoleAuthModal 
+          isOpen={authModalRole !== null}
+          onClose={() => setAuthModalRole(null)}
+          role={authModalRole || 'steward'}
+        />
       </div>
     </div>
   )

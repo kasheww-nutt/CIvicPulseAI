@@ -10,8 +10,10 @@ export function MyCases() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'active' | 'verified' | 'resolved'>('active');
 
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [filterMode, setFilterMode] = useState<'all' | 'high_severity'>('all');
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'popular'>('newest');
+  const [filterMode, setFilterMode] = useState<'all' | 'high_severity' | 'medium_severity' | 'low_severity' | 'high_reward' | 'medium_reward' | 'low_reward'>('all');
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Simple mocking: cases that are verified by me
   const verifiedCases = cases.filter(c => c.verifiedByMe);
@@ -21,6 +23,22 @@ export function MyCases() {
   
   // Reported / followed cases (for demo, just take cases that aren't resolved or verified)
   const activeCases = cases.filter(c => !c.verifiedByMe && c.status !== 'Resolved' && c.status !== 'Fix Verified');
+
+  const getHoursFromAge = (age: string) => {
+    const match = age.match(/(\d+)\s*(min|hour|day|week|month|year)s?/i);
+    if (!match) return 999999;
+    const num = parseInt(match[1], 10);
+    const unit = match[2].toLowerCase();
+    switch(unit) {
+      case 'min': return num / 60;
+      case 'hour': return num;
+      case 'day': return num * 24;
+      case 'week': return num * 24 * 7;
+      case 'month': return num * 24 * 30;
+      case 'year': return num * 24 * 365;
+      default: return 999999;
+    }
+  };
 
   const getActiveList = () => {
     let list;
@@ -32,12 +50,26 @@ export function MyCases() {
     
     // Apply Filter
     if (filterMode === 'high_severity') {
-      list = list.filter(c => c.severity >= 5);
+      list = list.filter(c => c.severity >= 4);
+    } else if (filterMode === 'medium_severity') {
+      list = list.filter(c => c.severity === 2 || c.severity === 3);
+    } else if (filterMode === 'low_severity') {
+      list = list.filter(c => c.severity <= 1);
+    } else if (filterMode === 'high_reward') {
+      list = list.filter(c => (c.bounty?.amount ?? 0) >= 100);
+    } else if (filterMode === 'medium_reward') {
+      list = list.filter(c => (c.bounty?.amount ?? 0) >= 25 && (c.bounty?.amount ?? 0) < 100);
+    } else if (filterMode === 'low_reward') {
+      list = list.filter(c => (c.bounty?.amount ?? 0) > 0 && (c.bounty?.amount ?? 0) < 25);
     }
     
-    // Apply Sort (assuming c.id or we can mock date, but we don't have date, so we reverse for oldest)
-    if (sortOrder === 'oldest') {
-      list = [...list].reverse();
+    // Apply Sort
+    if (sortOrder === 'newest') {
+      list = [...list].sort((a, b) => getHoursFromAge(a.age) - getHoursFromAge(b.age));
+    } else if (sortOrder === 'oldest') {
+      list = [...list].sort((a, b) => getHoursFromAge(b.age) - getHoursFromAge(a.age));
+    } else if (sortOrder === 'popular') {
+      list = [...list].sort((a, b) => (b.verificationCount || 0) - (a.verificationCount || 0)); // Using verificationCount as a proxy for popularity
     }
     
     return list;
@@ -45,12 +77,14 @@ export function MyCases() {
 
   const list = getActiveList();
 
-  const toggleSort = () => {
-    setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest');
+  const handleSortSelect = (order: 'newest' | 'oldest' | 'popular') => {
+    setSortOrder(order);
+    setIsSortOpen(false);
   };
 
-  const toggleFilter = () => {
-    setFilterMode(prev => prev === 'all' ? 'high_severity' : 'all');
+  const handleFilterSelect = (mode: 'all' | 'high_severity' | 'medium_severity' | 'low_severity' | 'high_reward' | 'medium_reward' | 'low_reward') => {
+    setFilterMode(mode);
+    setIsFilterOpen(false);
   };
 
   const tabs = [
@@ -143,13 +177,50 @@ export function MyCases() {
              </div>
           </div>
           
-          <div className="flex items-center gap-2">
-             <button onClick={toggleSort} className="flex-1 flex items-center justify-between bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[12px] px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                Sort: {sortOrder === 'newest' ? 'Newest' : 'Oldest'} <ChevronDown className="w-4 h-4 text-slate-400" />
-             </button>
-             <button onClick={toggleFilter} className={`flex items-center justify-center border rounded-[12px] w-[42px] h-[42px] shadow-sm transition-colors shrink-0 ${filterMode === 'high_severity' ? 'bg-[#0f284b] dark:bg-blue-600 text-white border-[#0f284b] dark:border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-[#e2e8f0] dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
-                <Filter className="w-4 h-4" />
-             </button>
+          <div className="flex items-center gap-2 relative z-20">
+             <div className="flex-1 relative">
+               <button onClick={() => setIsSortOpen(!isSortOpen)} className="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[12px] px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                  Sort: {sortOrder === 'newest' ? 'Newest' : sortOrder === 'popular' ? 'Popular' : 'Oldest'} <ChevronDown className="w-4 h-4 text-slate-400" />
+               </button>
+               {isSortOpen && (
+                 <>
+                   <div className="fixed inset-0 z-40" onClick={() => setIsSortOpen(false)} />
+                   <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[12px] shadow-lg z-50 overflow-hidden">
+                     <button onClick={() => handleSortSelect('oldest')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${sortOrder === 'oldest' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>Oldest</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleSortSelect('newest')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${sortOrder === 'newest' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>Newest</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleSortSelect('popular')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${sortOrder === 'popular' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>Popular</button>
+                   </div>
+                 </>
+               )}
+             </div>
+
+             <div className="relative shrink-0">
+               <button onClick={() => setIsFilterOpen(!isFilterOpen)} className={`flex items-center justify-center border rounded-[12px] w-[42px] h-[42px] shadow-sm transition-colors shrink-0 ${filterMode !== 'all' ? 'bg-[#0f284b] dark:bg-blue-600 text-white border-[#0f284b] dark:border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-[#e2e8f0] dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
+                  <Filter className="w-4 h-4" />
+               </button>
+               {isFilterOpen && (
+                 <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsFilterOpen(false)} />
+                   <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[12px] shadow-lg z-50 overflow-y-auto max-h-64">
+                     <button onClick={() => handleFilterSelect('all')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${filterMode === 'all' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>All Cases</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleFilterSelect('high_severity')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${filterMode === 'high_severity' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>High Severity</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleFilterSelect('medium_severity')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${filterMode === 'medium_severity' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>Medium Severity</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleFilterSelect('low_severity')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${filterMode === 'low_severity' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>Low Severity</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleFilterSelect('high_reward')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${filterMode === 'high_reward' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>High Reward</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleFilterSelect('medium_reward')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${filterMode === 'medium_reward' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>Medium Reward</button>
+                     <div className="h-px bg-[#e2e8f0] dark:bg-slate-700 w-full" />
+                     <button onClick={() => handleFilterSelect('low_reward')} className={`w-full text-left px-4 py-3 text-sm transition-colors ${filterMode === 'low_reward' ? 'bg-slate-50 dark:bg-slate-700/50 font-bold text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}>Low Reward</button>
+                   </div>
+                 </>
+               )}
+             </div>
           </div>
         </motion.div>
 
