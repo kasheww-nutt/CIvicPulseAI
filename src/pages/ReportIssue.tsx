@@ -123,7 +123,7 @@ export function ReportIssue() {
       lng: mapCenter[1] + lngOffset,
       distance: '0.0 km',
       severity: analysis.severity,
-      status: 'AI Analyzed',
+      status: 'Reported',
       age: 'Just now',
       verificationCount: 0,
       trustScoreImpact: 10,
