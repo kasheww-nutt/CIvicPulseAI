@@ -31,7 +31,10 @@ import {
   ShieldAlert,
   ArrowRight,
   ShieldAlert as FraudIcon,
-  BookOpen
+  BookOpen,
+  Landmark,
+  Clock,
+  BarChart
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getSeverityColor } from '../components/shared/CaseCard';
@@ -553,34 +556,67 @@ export function AdminDashboard() {
     <div className="flex flex-col gap-6 max-w-6xl mx-auto p-4 md:p-6 text-slate-900 dark:text-slate-100">
       
       {/* Sovereign Admin Header */}
-      <header className="flex flex-col gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center border border-blue-200 dark:border-blue-800/40 shadow-sm shrink-0">
-              <ShieldCheck className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-900/30">MUNICIPAL CORE OVERRIDE</span>
-                <span className="text-xs font-bold text-emerald-500">● Live Synchronization</span>
-              </div>
-              <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">Sovereign Admin Control Panel</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1 leading-relaxed">Control municipal parameters, assign stewards, inspect ledger transactions, direct departmental inbox integration, and run system fraud algorithms.</p>
-            </div>
+      <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden mb-2 relative">
+        <CardContent className="p-6 sm:p-8 flex flex-col gap-6 relative z-10">
+          <div className="flex justify-between items-center pb-5 sm:pb-6 border-b border-slate-100 dark:border-slate-800/60">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/30 px-3 py-1.5 rounded-lg border border-blue-100/80 dark:border-blue-800/40 flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4" /> MUNICIPAL CORE OVERRIDE
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/30 px-3 py-1.5 rounded-lg border border-emerald-100/80 dark:border-emerald-800/40 flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Live Synchronization
+            </span>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 self-start md:self-center">
-            <div className="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-end text-right">
-              <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Active SLA Core</span>
-              <span className="text-sm font-black text-slate-800 dark:text-white">{slaHours}h Target</span>
+          <div className="flex flex-col md:flex-row gap-8 md:gap-10">
+            {/* Left Column */}
+            <div className="flex-1 flex flex-col gap-5 sm:gap-6">
+              <div className="flex items-center gap-4 sm:gap-6">
+                <div className="w-16 h-16 sm:w-[88px] sm:h-[88px] rounded-2xl bg-blue-50/50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-100/50 dark:border-blue-800/30 shrink-0 shadow-sm">
+                  <ShieldCheck className="w-8 h-8 sm:w-11 sm:h-11 text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
+                </div>
+                <h1 className="text-3xl sm:text-[42px] font-black tracking-tight text-slate-900 dark:text-white leading-[1.1] max-w-sm">
+                  Sovereign Admin Control Panel
+                </h1>
+              </div>
+              <p className="text-[15px] sm:text-[17px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-[500px]">
+                Control municipal parameters, assign stewards, inspect ledger transactions, direct departmental inbox integration, and run system fraud algorithms.
+              </p>
             </div>
-            <div className="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-end text-right">
-              <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Multiplier rate</span>
-              <span className="text-sm font-black text-slate-800 dark:text-white">{rewardMultiplier.toFixed(1)}x rewards</span>
+
+            {/* Vertical Divider (Desktop only) */}
+            <div className="hidden md:block w-px bg-slate-100 dark:bg-slate-800/60" />
+
+            {/* Right Column (Cards) */}
+            <div className="flex flex-col gap-4 md:w-[320px] shrink-0">
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-5 shadow-sm">
+                <div className="w-12 h-12 rounded-full bg-blue-50/80 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                  <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] sm:text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Active SLA Core</span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-[26px] font-black text-slate-900 dark:text-white tracking-tight leading-none">{slaHours}h</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-white leading-none tracking-tight">Target</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-emerald-50/30 dark:bg-emerald-950/20 p-5 rounded-2xl border border-emerald-100/80 dark:border-emerald-900/30 flex items-center gap-5 shadow-sm">
+                <div className="w-12 h-12 rounded-full bg-emerald-100/60 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                  <BarChart className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] sm:text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">Multiplier rate</span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-[26px] font-black text-slate-900 dark:text-white tracking-tight leading-none">{rewardMultiplier.toFixed(1)}x</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-white leading-none tracking-tight">rewards</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </CardContent>
+      </Card>
 
       {/* Dynamic Action Logger / Console Feed */}
       <section className="bg-slate-950 text-slate-200 rounded-[24px] p-4 font-mono text-xs border border-slate-800 shadow-inner">
@@ -649,16 +685,25 @@ export function AdminDashboard() {
         <div className="lg:col-span-7 flex flex-col gap-6">
           
           {/* Section 1: System Parameters & Twilio Dispatch Sim */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border-l-[6px] border-l-blue-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-5">
-              <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
-                    <Sliders className="w-5 h-5 text-blue-600 dark:text-blue-400" /> System Parameters & Twilio Rules
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Control core response SLAs, financial multiplier gates, and active Twilio dispatch settings.</p>
+              <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                <div className="flex justify-between items-start">
+                  <div className="w-14 h-14 rounded-[16px] bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center border border-blue-100 dark:border-blue-800/40">
+                    <Sliders className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <Badge className="bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30 shrink-0 flex items-center gap-1.5 px-3 py-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Dynamic config
+                  </Badge>
                 </div>
-                <Badge className="bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30">Dynamic config</Badge>
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                    System Parameters & Twilio Rules
+                  </h2>
+                  <p className="text-[15px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Control core response SLAs, financial multiplier gates, and active Twilio dispatch settings.
+                  </p>
+                </div>
               </div>
 
               {/* Sliders */}
@@ -781,16 +826,25 @@ export function AdminDashboard() {
           </Card>
 
           {/* Section 2: Steward Area Assignments */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border-l-[6px] border-l-purple-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
-              <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
-                    <UserPlus className="w-5 h-5 text-purple-600 dark:text-purple-400" /> Steward Hub & Area Assignments
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Approve, monitor, and assign municipal stewards/reviewers to specific operational neighborhoods.</p>
+              <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                <div className="flex justify-between items-start">
+                  <div className="w-14 h-14 rounded-[16px] bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center border border-purple-100 dark:border-purple-800/40">
+                    <UserPlus className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <Badge className="bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30 shrink-0 flex items-center gap-1.5 px-3 py-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div> Active roster
+                  </Badge>
                 </div>
-                <Badge className="bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30">Active roster</Badge>
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                    Steward Hub & Area Assignments
+                  </h2>
+                  <p className="text-[15px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Approve, monitor, and assign municipal stewards/reviewers to specific operational neighborhoods.
+                  </p>
+                </div>
               </div>
 
               {/* Steward assignments list */}
@@ -881,16 +935,25 @@ export function AdminDashboard() {
         <div className="lg:col-span-5 flex flex-col gap-6">
           
           {/* Section 3: Ledger & Money Flow Payouts */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border-l-[6px] border-l-emerald-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
-              <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
-                    <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Money Flow & Ledger
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Authorize or inspect wallet bounties cash-outs from active citizens.</p>
+              <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                <div className="flex justify-between items-start">
+                  <div className="w-14 h-14 rounded-[16px] bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/40">
+                    <DollarSign className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <Badge className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 shrink-0 flex items-center gap-1.5 px-3 py-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Payouts
+                  </Badge>
                 </div>
-                <Badge className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">Payouts</Badge>
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                    Money Flow & Ledger
+                  </h2>
+                  <p className="text-[15px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Authorize or inspect wallet bounties cash-outs from active citizens.
+                  </p>
+                </div>
               </div>
 
               {/* Cash-outs claims list */}
@@ -925,16 +988,25 @@ export function AdminDashboard() {
           </Card>
 
           {/* Section 4: AI Fraud Anomaly Tracker */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border-l-[6px] border-l-red-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
-              <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
-                    <AlertOctagon className="w-5 h-5 text-red-600 dark:text-red-400" /> Fraud & Integrity Engine
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Inspect automated triggers and patterns that compromise proof structures.</p>
+              <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                <div className="flex justify-between items-start">
+                  <div className="w-14 h-14 rounded-[16px] bg-red-50 dark:bg-red-900/30 flex items-center justify-center border border-red-100 dark:border-red-800/40">
+                    <AlertOctagon className="w-7 h-7 text-red-600 dark:text-red-400" />
+                  </div>
+                  <Badge className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30 shrink-0 flex items-center gap-1.5 px-3 py-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div> AI Anomaly
+                  </Badge>
                 </div>
-                <Badge className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30">AI Anomaly</Badge>
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                    Fraud & Integrity Engine
+                  </h2>
+                  <p className="text-[15px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Inspect automated triggers and patterns that compromise proof structures.
+                  </p>
+                </div>
               </div>
 
               {/* Fraud anomalies list */}
@@ -987,16 +1059,25 @@ export function AdminDashboard() {
           </Card>
 
           {/* Section 5: Department coordination inbox */}
-          <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
+          <Card className="rounded-[32px] border-l-[6px] border-l-purple-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col gap-4">
-              <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div>
-                  <h2 className="text-lg font-black tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
-                    <Building2 className="w-5 h-5 text-purple-600 dark:text-purple-400" /> Municipal Department Inbox
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Integrate requests and priority complaints directly from city departments.</p>
+              <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                <div className="flex justify-between items-start">
+                  <div className="w-14 h-14 rounded-[16px] bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center border border-purple-100 dark:border-purple-800/40">
+                    <Building2 className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <Badge className="bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30 shrink-0 flex items-center gap-1.5 px-3 py-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div> Inbound
+                  </Badge>
                 </div>
-                <Badge className="bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30">Inbound</Badge>
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                    Municipal Department Inbox
+                  </h2>
+                  <p className="text-[15px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Integrate requests and priority complaints directly from city departments.
+                  </p>
+                </div>
               </div>
 
               {/* Department requests list */}

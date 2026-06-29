@@ -273,13 +273,13 @@ export function CitizenHome() {
       />
 
       {/* Top Bar matching mockup */}
-      <div className="flex items-center justify-between px-4 sm:px-6 pt-10 pb-2 relative z-50">
-        <div className="relative">
+      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 pt-10 pb-2 relative z-50">
+        <div className="relative shrink-0">
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => { setShowMenu(!showMenu); setShowLocationPrompt(false); }}
-            className="text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 p-3 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm"
+            className="text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 p-2.5 sm:p-3 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm"
           >
             <Menu className="w-5 h-5" />
           </motion.button>
@@ -333,20 +333,20 @@ export function CitizenHome() {
           </AnimatePresence>
         </div>
         
-        <div className="relative">
+        <div className="relative flex-1 flex justify-center max-w-[200px]">
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => { setShowLocationPrompt(!showLocationPrompt); setShowMenu(false); }}
-            className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200 hover:text-slate-600 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 px-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm"
+            className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200 hover:text-slate-600 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm max-w-full"
           >
-            <MapPin className="w-4 h-4 text-slate-700 dark:text-slate-400" />
-            <span className="font-bold text-[15px] max-w-[120px] truncate">{!location || location === 'Unknown Location' ? 'Set Location' : location.split(',')[0]}</span>
-            <ChevronDown className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+            <MapPin className="w-4 h-4 shrink-0 text-slate-700 dark:text-slate-400" />
+            <span className="font-bold text-[13px] sm:text-[15px] truncate">{!location || location === 'Unknown Location' ? 'Set Location' : location.split(',')[0]}</span>
+            <ChevronDown className="w-4 h-4 shrink-0 text-slate-500 dark:text-slate-400" />
           </motion.button>
           
           {showLocationPrompt && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[300px] bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[20px] p-4 shadow-lg z-[100]">
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[280px] sm:w-[300px] bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 rounded-[20px] p-4 shadow-lg z-[100]">
               {isManualInput ? (
                 <form onSubmit={submitManualLocation} className="flex flex-col gap-3 relative">
                   <div className="flex justify-between items-center">
@@ -400,17 +400,17 @@ export function CitizenHome() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={toggleDarkMode}
-            className="text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 p-3 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm"
+            className="text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 p-2.5 sm:p-3 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm"
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </motion.button>
 
-          <NotificationBell buttonClassName="text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 p-3 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm relative" />
+          <NotificationBell buttonClassName="text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors bg-white dark:bg-slate-800 p-2.5 sm:p-3 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm relative" />
         </div>
       </div>
 
