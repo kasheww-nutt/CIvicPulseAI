@@ -387,20 +387,22 @@ export function Login() {
                 </div>
 
                 {/* Switcher Tab Header */}
-                <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-full mt-4 border border-slate-200/20">
-                  <button
-                    onClick={() => { setError(''); setAuthMode('signin'); }}
-                    className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-all ${authMode === 'signin' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'}`}
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => { setError(''); setAuthMode('signup'); }}
-                    className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-all ${authMode === 'signup' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'}`}
-                  >
-                    Register
-                  </button>
-                </div>
+                {selectedRole === 'citizen' && (
+                  <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-full mt-4 border border-slate-200/20">
+                    <button
+                      onClick={() => { setError(''); setAuthMode('signin'); }}
+                      className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-all ${authMode === 'signin' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'}`}
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => { setError(''); setAuthMode('signup'); }}
+                      className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-all ${authMode === 'signup' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'}`}
+                    >
+                      Register
+                    </button>
+                  </div>
+                )}
 
                 {/* Form Errors */}
                 {error && (
