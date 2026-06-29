@@ -273,7 +273,7 @@ export function CitizenHome() {
       />
 
       {/* Top Bar matching mockup */}
-      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 pt-10 pb-2 relative z-50">
+      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 pt-3 pb-2 relative z-50">
         <div className="relative shrink-0">
           <motion.button 
             whileHover={{ scale: 1.05 }}
