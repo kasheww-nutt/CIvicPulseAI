@@ -239,6 +239,23 @@ export function CitizenHome() {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [timeAgo, setTimeAgo] = useState<string>('just now');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showRoleAuthModal, setShowRoleAuthModal] = useState<'steward' | 'admin' | null>(null);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+
+  const handleRoleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!showRoleAuthModal) return;
+    
+    // Authenticate logic for demo
+    if (authPassword === 'pass123' && (authEmail.includes('@civicpulse.ai') || authEmail === 'demo')) {
+      setRole(showRoleAuthModal);
+      navigate('/dashboard');
+    } else {
+      setAuthError('Invalid credentials. (Hint: password is pass123)');
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -302,14 +319,14 @@ export function CitizenHome() {
                   </Link>
                   <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
                   <button 
-                    onClick={() => { setRole('steward'); navigate('/dashboard'); }}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left"
+                    onClick={() => { setShowRoleAuthModal('steward'); setShowMenu(false); }}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left w-full"
                   >
                     <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Switch to Steward
                   </button>
                   <button 
-                    onClick={() => { setRole('admin'); navigate('/dashboard'); }}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left"
+                    onClick={() => { setShowRoleAuthModal('admin'); setShowMenu(false); }}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left w-full"
                   >
                     <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Switch to Admin
                   </button>
@@ -620,6 +637,80 @@ export function CitizenHome() {
            </button>
         </div>
       </motion.div>
+
+      {/* Role Authentication Modal */}
+      <AnimatePresence>
+        {showRoleAuthModal && (
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              onClick={() => {
+                setShowRoleAuthModal(null);
+                setAuthError('');
+                setAuthPassword('');
+                setAuthEmail('');
+              }}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-[340px] bg-white dark:bg-slate-900 rounded-[28px] p-5 shadow-2xl border border-slate-200 dark:border-slate-800"
+            >
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  Authenticate as {showRoleAuthModal === 'steward' ? 'Steward' : 'Admin'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Please enter your portal credentials.
+                </p>
+              </div>
+
+              {authError && (
+                <div className="mb-4 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs p-2.5 rounded-xl border border-red-200 dark:border-red-800/50">
+                  {authError}
+                </div>
+              )}
+
+              <form onSubmit={handleRoleAuth} className="flex flex-col gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 ml-1">Email</label>
+                  <input 
+                    type="email"
+                    required
+                    value={authEmail}
+                    onChange={e => setAuthEmail(e.target.value)}
+                    placeholder="demo@civicpulse.ai"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 ml-1">Password</label>
+                  <input 
+                    type="password"
+                    required
+                    value={authPassword}
+                    onChange={e => setAuthPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  />
+                </div>
+                
+                <button
+                  type="submit"
+                  className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow-md flex items-center justify-center gap-2"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  Verify Identity
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
