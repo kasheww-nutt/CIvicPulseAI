@@ -33,34 +33,27 @@ interface DemoContextType extends DemoState {
 const DemoContext = createContext<DemoContextType | undefined>(undefined);
 
 export function DemoProvider({ children }: { children: ReactNode }) {
-  const { user, dbRole } = useAuth();
+  const { user, dbRole, activePortal, setActivePortal } = useAuth();
   const [currentView, setCurrentView] = useState<'citizen' | 'steward' | 'admin'>('citizen');
   
   useEffect(() => {
-    // Only auto-set the view if the user is logging in initially and hasn't explicitly chosen a role.
-    // Or, actually, let's only set it if the currentView is not allowed by the new dbRole.
-    if (dbRole) {
-      setCurrentView(prevView => {
-        if (dbRole === 'citizen') return 'citizen';
-        if (dbRole === 'steward' && prevView === 'admin') return 'steward';
-        if (dbRole === 'steward' && prevView === 'citizen') return 'steward';
-        // If admin, they can be anything, so keep prevView if they've explicitly set it, 
-        // but default to admin if they just logged in and were 'citizen' by default.
-        if (dbRole === 'admin' && prevView === 'citizen') return 'admin';
-        return prevView;
-      });
+    if (activePortal) {
+      setCurrentView(activePortal);
     }
-  }, [dbRole]);
+  }, [activePortal]);
 
   const userRole = currentView;
   
   const setRole = (role: 'citizen' | 'steward' | 'admin') => {
     if (dbRole === 'admin') {
       setCurrentView(role);
+      setActivePortal(role);
     } else if (dbRole === 'steward' && (role === 'steward' || role === 'citizen')) {
       setCurrentView(role);
+      setActivePortal(role);
     } else if (dbRole === 'citizen' && role === 'citizen') {
       setCurrentView(role);
+      setActivePortal(role);
     } else {
       alert("Access Denied: Your account does not have permission for this role. An admin must upgrade your account.");
     }
@@ -228,6 +221,62 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem('civic_suspended_users', JSON.stringify(suspendedUsers));
   }, [suspendedUsers]);
+
+  // Synchronize the current citizen user to the persistent fraud alerts list so they can test suspending their own account
+  useEffect(() => {
+    if (user && dbRole === 'citizen' && user.email) {
+      const email = user.email;
+      // 1. Save to registered citizens list
+      const savedCitizens = localStorage.getItem('civic_registered_citizens');
+      const list: string[] = savedCitizens ? JSON.parse(savedCitizens) : [];
+      if (!list.includes(email)) {
+        list.push(email);
+        localStorage.setItem('civic_registered_citizens', JSON.stringify(list));
+      }
+
+      // 2. Ensure they are in the fraudAlerts state
+      setFraudAlerts(prev => {
+        if (prev.some(f => f.user === email)) {
+          return prev;
+        }
+        const newAlert: FraudAlert = {
+          id: `fr-reg-${Date.now()}`,
+          user: email,
+          reason: 'Automated municipal integrity scan flagged high frequency submission anomaly.',
+          anomalyScore: 89,
+          status: 'Flagged',
+          location: location || 'Indiranagar'
+        };
+        return [newAlert, ...prev];
+      });
+    }
+  }, [user, dbRole, location]);
+
+  // Load registered citizens' alerts in case we are in another session / logged in as admin
+  useEffect(() => {
+    const savedCitizens = localStorage.getItem('civic_registered_citizens');
+    if (savedCitizens) {
+      const list: string[] = JSON.parse(savedCitizens);
+      setFraudAlerts(prev => {
+        let updated = false;
+        const copy = [...prev];
+        list.forEach((email, idx) => {
+          if (!copy.some(f => f.user === email)) {
+            copy.unshift({
+              id: `fr-reg-restore-${idx}-${Date.now()}`,
+              user: email,
+              reason: 'Automated municipal integrity scan flagged high frequency submission anomaly.',
+              anomalyScore: 89,
+              status: 'Flagged',
+              location: 'Indiranagar'
+            });
+            updated = true;
+          }
+        });
+        return updated ? copy : prev;
+      });
+    }
+  }, []);
 
 
   // --- ADMIN PORTAL STATE MODIFIER METHODS ---

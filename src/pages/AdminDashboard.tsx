@@ -68,6 +68,16 @@ export function AdminDashboard() {
   const { cases, userRole } = useDemo();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (userRole === 'citizen') {
+      navigate('/');
+    }
+  }, [userRole, navigate]);
+
+  if (userRole === 'citizen') {
+    return null;
+  }
+
   // --- DYNAMIC REPORT TRENDS ---
   const trendDataMap = new Map<number, number>();
   cases.forEach(c => {
@@ -275,7 +285,7 @@ export function AdminDashboard() {
   // 1. CHOOSE STEWARD OPERATIONAL DASHBOARD
   if (userRole === 'steward') {
     return (
-      <div className="flex flex-col gap-4 md:gap-6 w-full mx-auto px-2 md:px-4">
+      <div className="flex flex-col gap-4 md:gap-6 w-full mx-auto px-2 md:px-4 pt-4 sm:pt-6">
         <header className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -340,7 +350,7 @@ export function AdminDashboard() {
         <div className="flex flex-col gap-6">
            {/* Verification Queue */}
            <section className="flex flex-col gap-4">
-             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2 px-2">
                Community Verification Needed <Badge className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/30 rounded-full px-2 py-0.5">{verificationQueue.length}</Badge>
              </h2>
              <div className="flex flex-col gap-3">
@@ -366,7 +376,7 @@ export function AdminDashboard() {
 
            {/* Packet Preparation Queue */}
            <section className="flex flex-col gap-4">
-             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2 px-2">
                Packet Preparation Queue <Badge className="bg-slate-100 dark:bg-slate-800 text-[#0f284b] dark:text-blue-400 border-[#e2e8f0] dark:border-slate-700 rounded-full px-2 py-0.5">{packetPreparationQueue.length}</Badge>
              </h2>
              <div className="flex flex-col gap-3">
@@ -395,7 +405,7 @@ export function AdminDashboard() {
         <div className="flex flex-col gap-6 mt-6">
            {/* Fix Verification Queue */}
            <section className="flex flex-col gap-4">
-             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2 px-2">
                Fix Verification Queue <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30 rounded-full px-2 py-0.5">{fixVerificationQueue.length}</Badge>
              </h2>
              <div className="flex flex-col gap-3">
@@ -421,7 +431,7 @@ export function AdminDashboard() {
 
            {/* Duplicate Fusion Review */}
            <section className="flex flex-col gap-4">
-             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+             <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2 px-2">
                Duplicate Fusion Review <Badge className="bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/30 rounded-full px-2 py-0.5">{duplicateFusionReview.length}</Badge>
              </h2>
              <div className="flex flex-col gap-3">

@@ -5,7 +5,8 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
@@ -16,12 +17,15 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (e: string, p: string) => Promise<void>;
   signInWithEmail: (e: string, p: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   demoLogin: (customEmail?: string, customName?: string, customRole?: 'citizen' | 'steward' | 'admin') => void;
   signOut: () => Promise<void>;
   language: string;
   setLanguage: (lang: string) => void;
   dbRole: 'citizen' | 'steward' | 'admin' | null;
   setDbRole: (role: 'citizen' | 'steward' | 'admin') => Promise<void>;
+  activePortal: 'citizen' | 'steward' | 'admin' | null;
+  setActivePortal: (portal: 'citizen' | 'steward' | 'admin' | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [language, setLanguage] = useState('en');
   const [dbRole, setDbRoleState] = useState<'citizen' | 'steward' | 'admin' | null>(null);
+  const [activePortal, setActivePortal] = useState<'citizen' | 'steward' | 'admin' | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -75,6 +80,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
+  const resetPassword = async (email: string) => {
+    await sendPasswordResetEmail(auth, email);
+  };
+
   const demoLogin = (customEmail?: string, customName?: string, customRole: 'citizen' | 'steward' | 'admin' = 'citizen') => {
     setUser({
       uid: 'demo-user-' + (customName || '123'),
@@ -94,9 +103,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toJSON: () => ({}),
     } as User);
     setDbRoleState(customRole);
+    setActivePortal(customRole);
   };
 
   const signOut = async () => {
+    setActivePortal(null);
     if (user?.uid && user.uid.startsWith('demo-user-')) {
       setUser(null);
       setDbRoleState(null);
@@ -118,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ 
-      user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, demoLogin, signOut, language, setLanguage, dbRole, setDbRole
+      user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, resetPassword, demoLogin, signOut, language, setLanguage, dbRole, setDbRole, activePortal, setActivePortal
     }}>
       {!loading && children}
     </AuthContext.Provider>

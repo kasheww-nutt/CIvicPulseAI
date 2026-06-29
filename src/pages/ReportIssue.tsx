@@ -136,7 +136,8 @@ export function ReportIssue() {
       duplicateRisk: duplicates.length > 0 ? 'High' : 'Low',
       proofLadderStage: 1,
       nextBestAction: 'Requires community verification.',
-      authorId: user?.uid || 'me'
+      authorId: user?.uid || 'me',
+      imagePlaceholder: imagePreview || undefined
     };
     reportCase(newCase);
     navigate(`/case/${newCase.id}`);

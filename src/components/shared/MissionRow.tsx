@@ -75,12 +75,18 @@ export const MissionRow: React.FC<MissionRowProps> = ({ item, onVerify, compact 
 
             {/* Image Placeholder */}
             <div className="w-20 h-16 sm:w-24 sm:h-20 bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
-              {item.category === 'Pothole / road damage' ? (
-                <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" />
+              {item.imagePlaceholder ? (
+                <img src={item.imagePlaceholder} className="w-full h-full object-cover" alt="Issue Evidence" referrerPolicy="no-referrer" />
+              ) : item.category === 'Pothole / road damage' ? (
+                <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" referrerPolicy="no-referrer" />
               ) : item.category === 'Water leakage' ? (
-                <img src="https://images.unsplash.com/photo-1620215714392-4f05fc2b7811?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" />
+                <img src="https://images.unsplash.com/photo-1620215714392-4f05fc2b7811?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" referrerPolicy="no-referrer" />
+              ) : item.category === 'Broken streetlight' ? (
+                <img src="https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" referrerPolicy="no-referrer" />
+              ) : item.category === 'Garbage overflow' ? (
+                <img src="https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" referrerPolicy="no-referrer" />
               ) : item.category === 'Other civic hazard' ? (
-                <img src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" />
+                <img src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Issue" referrerPolicy="no-referrer" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600">
                   <AlertTriangle className="w-6 h-6" />

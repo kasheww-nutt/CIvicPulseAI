@@ -29,6 +29,22 @@ import {
 } from "../lib/caseLifecycle";
 import { motion } from "motion/react";
 
+const getCategoryFallbackImage = (category: string) => {
+  switch (category) {
+    case 'Pothole / road damage':
+      return 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=800';
+    case 'Water leakage':
+      return 'https://images.unsplash.com/photo-1620215714392-4f05fc2b7811?auto=format&fit=crop&q=80&w=800';
+    case 'Broken streetlight':
+      return 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?auto=format&fit=crop&q=80&w=800';
+    case 'Garbage overflow':
+      return 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&q=80&w=800';
+    case 'Other civic hazard':
+    default:
+      return 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?auto=format&fit=crop&q=80&w=800';
+  }
+};
+
 export function CaseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -312,19 +328,16 @@ export function CaseDetail() {
           >
             {isClosed && caseItem.fixedImagePlaceholder ? (
               <BeforeAfterSlider
-                beforeImage={caseItem.imagePlaceholder || ""}
+                beforeImage={caseItem.imagePlaceholder || getCategoryFallbackImage(caseItem.category)}
                 afterImage={caseItem.fixedImagePlaceholder}
               />
-            ) : caseItem.imagePlaceholder ? (
+            ) : (
               <img
-                src={caseItem.imagePlaceholder}
+                src={caseItem.imagePlaceholder || getCategoryFallbackImage(caseItem.category)}
                 alt="Civic Issue"
                 className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
               />
-            ) : (
-              <>
-                <ImageIcon className="w-12 h-12 mb-2 opacity-30" />
-              </>
             )}
 
             {!isClosed && (

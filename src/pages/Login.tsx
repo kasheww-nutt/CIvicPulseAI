@@ -27,7 +27,9 @@ import { getErrorMessage } from '../lib/errorMapping';
 
 export function Login() {
   const [selectedRole, setSelectedRole] = useState<'citizen' | 'steward' | 'admin' | null>(null);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [authMode, setAuthMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
   
   // Sign in states
   const [email, setEmail] = useState('');
@@ -43,7 +45,7 @@ export function Login() {
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail, language, demoLogin } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword, language, demoLogin, activePortal, setActivePortal } = useAuth();
   const { isDarkMode, toggleDarkMode, setRole } = useDemo();
   const navigate = useNavigate();
   const t = useTranslation(language);
@@ -169,6 +171,36 @@ export function Login() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Please enter your email address first.');
+      return;
+    }
+
+    setIsResetting(true);
+    setError('');
+    setResetSuccess(null);
+
+    // If it's a demo account, we don't send a real firebase reset link, we can simulate it beautifully.
+    if (email === 'demo@civicpulse.ai' || email === 'steward@civicpulse.ai' || email === 'admin@civicpulse.ai') {
+      setTimeout(() => {
+        setIsResetting(false);
+        setResetSuccess(`Demo Account Auto-Reset: For demo access, the password is always 'pass123'. You can sign in immediately!`);
+      }, 800);
+      return;
+    }
+
+    try {
+      await resetPassword(email);
+      setResetSuccess('If an account exists with this email address, a secure password reset link has been successfully sent! Please check your inbox and follow the instructions.');
+    } catch (err: any) {
+      setError(getErrorMessage(err) || 'Failed to send password reset email. Please verify the email is registered.');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const handleGoogleLogin = async () => {
     try {
       await signInWithGoogle();
@@ -183,27 +215,60 @@ export function Login() {
 
   // Listen for login and route based on role
   const { user, dbRole, signOut } = useAuth();
-  useEffect(() => {
+
+  const isAuthorizedForPortal = (roleInDb: string | null, targetRole: 'citizen' | 'steward' | 'admin') => {
+    if (!roleInDb) return false;
+    if (roleInDb === 'admin') return true;
+    if (roleInDb === 'steward') return targetRole === 'steward' || targetRole === 'citizen';
+    return targetRole === 'citizen';
+  };
+
+  const selectPortal = async (role: 'citizen' | 'steward' | 'admin') => {
     if (user && dbRole) {
-      if (selectedRole && selectedRole !== dbRole) {
+      if (isAuthorizedForPortal(dbRole, role)) {
+        setActivePortal(role);
+      } else {
+        await signOut();
+        resetForm();
+        setSelectedRole(role);
+        setAuthMode('signin');
+        setError('Your currently logged in account does not support this access. Please login with correct details.');
+      }
+    } else {
+      resetForm();
+      setSelectedRole(role);
+      setAuthMode('signin');
+    }
+  };
+
+  // Redirect to correct dashboard when authenticated and activePortal is set
+  useEffect(() => {
+    if (user && dbRole && activePortal) {
+      navigate(activePortal === 'citizen' ? '/' : '/dashboard');
+    }
+  }, [user, dbRole, activePortal, navigate]);
+
+  // Handle post-login authorization check
+  useEffect(() => {
+    if (user && dbRole && selectedRole && !activePortal) {
+      if (isAuthorizedForPortal(dbRole, selectedRole)) {
+        setActivePortal(selectedRole);
+      } else {
         setError(
           <>
             Invalid for this role. You belong in the {dbRole} portal.{' '}
             <button
               type="button"
-              onClick={() => { setError(''); setSelectedRole(dbRole as any); signOut(); }}
+              onClick={() => { setError(''); setSelectedRole(dbRole as any); setActivePortal(dbRole); }}
               className="mt-1 font-bold underline text-red-700 dark:text-red-300 block hover:text-red-800"
             >
               Go to {dbRole} portal
             </button>
           </>
         );
-        signOut();
-        return;
       }
-      navigate(dbRole === 'citizen' ? '/' : '/dashboard');
     }
-  }, [user, dbRole, navigate, selectedRole, signOut]);
+  }, [user, dbRole, selectedRole, activePortal, setActivePortal]);
 
   const resetForm = () => {
     setError('');
@@ -283,7 +348,7 @@ export function Login() {
                   <motion.div 
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => { resetForm(); setSelectedRole('citizen'); setAuthMode('signin'); }}
+                    onClick={() => selectPortal('citizen')}
                     className="group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-400 dark:hover:border-blue-500 rounded-[20px] p-4 flex items-start gap-3.5 shadow-sm hover:shadow-md transition-all cursor-pointer text-left relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/[0.02] dark:bg-blue-400/[0.02] rounded-bl-full pointer-events-none group-hover:bg-blue-500/[0.04] transition-colors" />
@@ -306,7 +371,7 @@ export function Login() {
                   <motion.div 
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => { resetForm(); setSelectedRole('steward'); setAuthMode('signin'); }}
+                    onClick={() => selectPortal('steward')}
                     className="group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-400 dark:hover:border-emerald-500 rounded-[20px] p-4 flex items-start gap-3.5 shadow-sm hover:shadow-md transition-all cursor-pointer text-left relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/[0.02] dark:bg-emerald-400/[0.02] rounded-bl-full pointer-events-none group-hover:bg-emerald-500/[0.04] transition-colors" />
@@ -329,7 +394,7 @@ export function Login() {
                   <motion.div 
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => { resetForm(); setSelectedRole('admin'); setAuthMode('signin'); }}
+                    onClick={() => selectPortal('admin')}
                     className="group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 hover:border-amber-400 dark:hover:border-amber-500 rounded-[20px] p-4 flex items-start gap-3.5 shadow-sm hover:shadow-md transition-all cursor-pointer text-left relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/[0.02] dark:bg-amber-400/[0.02] rounded-bl-full pointer-events-none group-hover:bg-amber-500/[0.04] transition-colors" />
@@ -393,17 +458,21 @@ export function Login() {
 
                 <div className="text-center mt-3">
                   <h2 className="text-xl font-black text-[#0a1930] dark:text-white tracking-tight">
-                    {authMode === 'signin' ? 'Sign In' : 'Create Account'}
+                    {authMode === 'signin' ? 'Sign In' : authMode === 'signup' ? 'Create Account' : 'Reset Password'}
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    {selectedRole === 'citizen' && 'Accessing Crowdsourced Pulse'}
-                    {selectedRole === 'steward' && 'Steward operations & review'}
-                    {selectedRole === 'admin' && 'System configuration & admin overrides'}
+                    {authMode === 'forgot' ? 'Get a secure link to recover your account' : (
+                      <>
+                        {selectedRole === 'citizen' && 'Accessing Crowdsourced Pulse'}
+                        {selectedRole === 'steward' && 'Steward operations & review'}
+                        {selectedRole === 'admin' && 'System configuration & admin overrides'}
+                      </>
+                    )}
                   </p>
                 </div>
 
                 {/* Switcher Tab Header */}
-                {selectedRole === 'citizen' && (
+                {selectedRole === 'citizen' && authMode !== 'forgot' && (
                   <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-full mt-4 border border-slate-200/20">
                     <button
                       onClick={() => { setError(''); setAuthMode('signin'); }}
@@ -451,9 +520,18 @@ export function Login() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-[#0a1930] dark:text-slate-300 uppercase tracking-wider ml-1 mb-1">
-                        Password
-                      </label>
+                      <div className="flex justify-between items-center ml-1 mb-1">
+                        <label className="block text-[11px] font-bold text-[#0a1930] dark:text-slate-300 uppercase tracking-wider">
+                          Password
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => { setError(''); setResetSuccess(null); setAuthMode('forgot'); }}
+                          className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline font-bold"
+                        >
+                          Forgot?
+                        </button>
+                      </div>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                           <Lock className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
@@ -491,7 +569,7 @@ export function Login() {
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </form>
-                ) : (
+                ) : authMode === 'signup' ? (
                   /* SIGN UP FORM (With Resend API support & simulation) */
                   <form className="space-y-3 mt-4" onSubmit={handleEmailSignup}>
                     <div>
@@ -603,6 +681,62 @@ export function Login() {
                       <span>Create Account</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
+                  </form>
+                ) : (
+                  /* FORGOT PASSWORD FORM */
+                  <form className="space-y-3 mt-4" onSubmit={handleForgotPassword}>
+                    {resetSuccess ? (
+                      <div className="bg-emerald-50/80 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 p-3 rounded-xl text-xs shadow-sm text-left font-semibold leading-relaxed">
+                        {resetSuccess}
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#0a1930] dark:text-slate-300 uppercase tracking-wider ml-1 mb-1">
+                            Email Address
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                              <Mail className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
+                            </div>
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="block w-full pl-9 pr-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 bg-slate-50/50 dark:bg-slate-950/40 text-[#0a1930] dark:text-white placeholder-slate-400 text-xs transition-all shadow-sm"
+                              placeholder="you@example.com"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isResetting}
+                          className="w-full h-11 rounded-xl text-white text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0 active:brightness-95 transition-all mt-4 border-0 shadow-md disabled:opacity-50"
+                          style={{
+                            background: selectedRole === 'citizen' 
+                              ? "linear-gradient(90deg, #1e40af 0%, #3b82f6 100%)" 
+                              : selectedRole === 'steward'
+                                ? "linear-gradient(90deg, #065f46 0%, #10b981 100%)"
+                                : "linear-gradient(90deg, #92400e 0%, #f59e0b 100%)"
+                          }}
+                        >
+                          <span>{isResetting ? "Sending Email..." : "Send Reset Link"}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
+
+                    <div className="pt-2 text-center">
+                      <button
+                        type="button"
+                        onClick={() => { setError(''); setResetSuccess(null); setAuthMode('signin'); }}
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-bold transition-all"
+                      >
+                        Back to Sign In
+                      </button>
+                    </div>
                   </form>
                 )}
 

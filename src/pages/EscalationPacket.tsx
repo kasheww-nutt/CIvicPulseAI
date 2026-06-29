@@ -168,7 +168,7 @@ export function EscalationPacket() {
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+    <div className="flex flex-col gap-6 max-w-3xl mx-auto px-2 sm:px-4 pt-4 pb-12">
       <Button variant="ghost" className="w-fit -ml-4 text-slate-500 gap-2 hover:bg-slate-100" onClick={() => navigate(-1)}>
         <ArrowLeft className="w-4 h-4" /> Back to Case
       </Button>

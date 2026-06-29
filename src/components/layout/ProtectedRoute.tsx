@@ -5,7 +5,7 @@ import { ShieldAlert, LogOut } from 'lucide-react';
 import React from 'react';
 
 export function ProtectedRoute() {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, activePortal } = useAuth();
   const { suspendedUsers } = useDemo();
 
   if (loading) {
@@ -15,6 +15,10 @@ export function ProtectedRoute() {
   }
 
   if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!activePortal) {
     return <Navigate to="/login" replace />;
   }
 
