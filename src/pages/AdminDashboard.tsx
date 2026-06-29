@@ -558,12 +558,12 @@ export function AdminDashboard() {
       {/* Sovereign Admin Header */}
       <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden mb-2 relative">
         <CardContent className="p-6 sm:p-8 flex flex-col gap-6 relative z-10">
-          <div className="flex justify-between items-center pb-5 sm:pb-6 border-b border-slate-100 dark:border-slate-800/60">
+          <div className="flex flex-wrap justify-between items-start sm:items-center gap-3 sm:gap-4 pb-5 sm:pb-6 border-b border-slate-100 dark:border-slate-800/60">
             <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/30 px-3 py-1.5 rounded-lg border border-blue-100/80 dark:border-blue-800/40 flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4" /> MUNICIPAL CORE OVERRIDE
+              <ShieldCheck className="w-4 h-4 shrink-0" /> <span className="text-left">MUNICIPAL CORE OVERRIDE</span>
             </span>
             <span className="text-[11px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/30 px-3 py-1.5 rounded-lg border border-emerald-100/80 dark:border-emerald-800/40 flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Live Synchronization
+              <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div> <span className="text-left">Live Synchronization</span>
             </span>
           </div>
 
@@ -574,8 +574,9 @@ export function AdminDashboard() {
                 <div className="w-16 h-16 sm:w-[88px] sm:h-[88px] rounded-2xl bg-blue-50/50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-100/50 dark:border-blue-800/30 shrink-0 shadow-sm">
                   <ShieldCheck className="w-8 h-8 sm:w-11 sm:h-11 text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
                 </div>
-                <h1 className="text-3xl sm:text-[42px] font-black tracking-tight text-slate-900 dark:text-white leading-[1.1] max-w-sm">
-                  Sovereign Admin Control Panel
+                <h1 className="flex-1 min-w-0 max-w-none text-[26px] sm:text-[34px] font-black tracking-tight text-slate-900 dark:text-white leading-[1.05]">
+                  Sovereign Admin <br />
+                  Control Panel
                 </h1>
               </div>
               <p className="text-[15px] sm:text-[17px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-[500px]">
