@@ -457,7 +457,7 @@ export function AdminDashboard() {
                     <span className="font-mono text-[9px] text-slate-400">ID: {exportResponse.messageId || "SIM-PREVIEW"}</span>
                   </div>
 
-                  <div className="bg-white text-slate-900 rounded-xl overflow-y-auto max-h-[240px] p-5 shadow-lg border border-slate-200">
+                  <div className="bg-white text-slate-900 rounded-xl overflow-y-auto minimal-scrollbar max-h-[240px] p-5 shadow-lg border border-slate-200">
                     <div dangerouslySetInnerHTML={{ __html: exportResponse.htmlContent }} />
                   </div>
                   
@@ -627,7 +627,7 @@ export function AdminDashboard() {
           </span>
           <span className="text-[9px] text-slate-400">System State: Ready</span>
         </div>
-        <div className="flex flex-col gap-1 max-h-[85px] overflow-y-auto font-mono text-slate-300">
+        <div className="flex flex-col gap-1 max-h-[85px] overflow-y-auto minimal-scrollbar font-mono text-slate-300">
           {systemLogs.map((log, i) => (
             <div key={i} className="flex gap-2 text-[11px]">
               <span className="text-slate-400 select-none">&gt;</span>
@@ -849,7 +849,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Steward assignments list */}
-              <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto minimal-scrollbar pr-2">
                 {stewards.map(st => (
                   <div key={st.id} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center gap-3">
                     <div className="flex flex-col gap-1 min-w-0 flex-1">
@@ -958,7 +958,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Cash-outs claims list */}
-              <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto minimal-scrollbar pr-2">
                 {disbursals.map(d => (
                   <div key={d.id} className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-2">
                     <div className="flex justify-between items-start gap-3">
@@ -1011,7 +1011,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Fraud anomalies list */}
-              <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto minimal-scrollbar pr-2">
                 {fraudAlerts.length === 0 ? (
                   <p className="text-xs text-slate-400 text-center py-4">No citizen anomaly alerts reported.</p>
                 ) : (
@@ -1082,7 +1082,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Department requests list */}
-              <div className="flex flex-col gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2.5 max-h-[260px] overflow-y-auto minimal-scrollbar pr-2">
                 {inboxMessages.map(msg => (
                   <div key={msg.id} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
                     <div className="flex flex-col gap-1">
