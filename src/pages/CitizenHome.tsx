@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useDemo } from '../context/DemoContext';
+import { cn } from '../lib/utils';
 import { MissionRow } from '../components/shared/MissionRow';
 import { MapPin, Navigation, Map as MapIcon, ShieldCheck, CheckCircle2, Award, ArrowRight, Plus, Minus, Maximize, Minimize, Menu, Bell, Search, MoreVertical, FileText, ChevronDown, UserCircle, TrendingUp, ExternalLink, RefreshCw, ClipboardList, FileBox, CreditCard, BellRing, Moon, Sun, ArrowLeft, Shield, LayoutDashboard, Mail, Lock } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -40,7 +41,7 @@ function MapControls({ center, isFullscreen, onToggleFullscreen }: { center: [nu
   }, [isFullscreen, map]);
 
   return (
-    <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-[1000] pointer-events-auto">
+    <div className={cn("absolute right-2 flex flex-col gap-1.5 z-[1000] pointer-events-auto transition-all duration-300", isFullscreen ? "top-28" : "top-2")}>
       <div className="flex flex-col bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
         <button onClick={handleZoomIn} className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 border-b border-slate-200 dark:border-slate-700" title="Zoom In">
           <Plus className="w-3.5 h-3.5" />
@@ -84,7 +85,7 @@ const getSeverityIcon = (severity: number) => {
 };
 
 export function CitizenHome() {
-  const { cases, location, setLocation, verifyCase, trustScore, setRole, isDarkMode, toggleDarkMode } = useDemo();
+  const { cases, location, setLocation, verifyCase, trustScore, userRole, setRole, isDarkMode, toggleDarkMode } = useDemo();
   const { signOut } = useAuth();
   const navigate = useNavigate();
   
@@ -290,7 +291,7 @@ export function CitizenHome() {
       />
 
       {/* Top Bar matching mockup */}
-      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 pt-3 pb-2 relative z-50">
+      <div className={cn("flex items-center justify-between gap-2 px-4 sm:px-6 pb-2 transition-all duration-300 left-0 right-0 top-0", isFullscreen ? "fixed z-[1001] pt-6 bg-transparent max-w-[430px] mx-auto" : "relative z-50 pt-3")}>
         <div className="relative shrink-0">
           <motion.button 
             whileHover={{ scale: 1.05 }}
@@ -318,18 +319,30 @@ export function CitizenHome() {
                     <FileText className="w-4 h-4" /> My Reports
                   </Link>
                   <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
-                  <button 
-                    onClick={() => { setShowRoleAuthModal('steward'); setShowMenu(false); }}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left w-full"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Switch to Steward
-                  </button>
-                  <button 
-                    onClick={() => { setShowRoleAuthModal('admin'); setShowMenu(false); }}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left w-full"
-                  >
-                    <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Switch to Admin
-                  </button>
+                  {userRole !== 'citizen' && (
+                    <button 
+                      onClick={() => { setRole('citizen'); setShowMenu(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left w-full"
+                    >
+                      <UserCircle className="w-4 h-4 text-blue-500" /> Switch to Citizen
+                    </button>
+                  )}
+                  {userRole !== 'steward' && (
+                    <button 
+                      onClick={() => { setShowRoleAuthModal('steward'); setShowMenu(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left w-full"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Switch to Steward
+                    </button>
+                  )}
+                  {userRole !== 'admin' && (
+                    <button 
+                      onClick={() => { setShowRoleAuthModal('admin'); setShowMenu(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors text-left w-full"
+                    >
+                      <Award className="w-4 h-4 text-orange-600 dark:text-orange-400" /> Switch to Admin
+                    </button>
+                  )}
                   <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
                   <button 
                     onClick={async () => {
@@ -501,7 +514,7 @@ export function CitizenHome() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="px-3 mb-6 relative z-10"
+        className={cn("px-3 mb-6 relative", isFullscreen ? "z-[1000]" : "z-10")}
       >
         <div className="bg-white dark:bg-slate-800 rounded-[24px] p-2 sm:p-3 border border-[#e2e8f0] dark:border-slate-700 shadow-sm flex flex-col">
           <div className="flex justify-between items-center mb-2 px-1">
@@ -518,15 +531,6 @@ export function CitizenHome() {
             ? "fixed inset-0 z-[1000] w-full max-w-[430px] mx-auto bg-white dark:bg-slate-900 flex flex-col" 
             : "rounded-[16px] overflow-hidden border border-[#e2e8f0] dark:border-slate-700 h-[170px] relative z-0"}>
             
-            {isFullscreen && (
-              <div className="bg-white dark:bg-slate-800 px-4 py-3 flex items-center justify-between shadow-sm z-[1001] border-b border-slate-200 dark:border-slate-700">
-                 <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Live Map</h2>
-                 <button onClick={() => setIsFullscreen(false)} className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-1">
-                    <Minimize className="w-5 h-5" />
-                 </button>
-              </div>
-            )}
-
             <MapContainer 
               center={mapCenter} 
               zoom={14} 
