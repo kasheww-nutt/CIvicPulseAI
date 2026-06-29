@@ -244,7 +244,7 @@ export function Profile() {
         </div>
 
         {/* Wallet History */}
-        <div className="flex flex-col gap-3 pb-8">
+        <div className="flex flex-col gap-3">
           <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 flex items-center gap-1.5">
             <Wallet className="w-3.5 h-3.5" /> Wallet History
           </h2>

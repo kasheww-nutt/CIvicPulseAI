@@ -43,10 +43,49 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { getSeverityColor } from '../components/shared/CaseCard';
 import { getLifecycleStage, getBlockerReason } from '../lib/caseLifecycle';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+function parseAgeToDaysAgo(age: string): number {
+  if (!age) return 0;
+  const lowerAge = age.toLowerCase();
+  if (lowerAge.includes('just now') || lowerAge.includes('min') || lowerAge.includes('hour')) return 0;
+  
+  const match = lowerAge.match(/(\d+)\s+(day|week|month)/);
+  if (!match) return 0;
+  
+  const num = parseInt(match[1]);
+  const unit = match[2];
+  
+  switch(unit) {
+    case 'day': return num;
+    case 'week': return num * 7;
+    case 'month': return num * 30;
+    default: return 0;
+  }
+}
 
 export function AdminDashboard() {
   const { cases, userRole } = useDemo();
   const navigate = useNavigate();
+
+  // --- DYNAMIC REPORT TRENDS ---
+  const trendDataMap = new Map<number, number>();
+  cases.forEach(c => {
+    const daysAgo = parseAgeToDaysAgo(c.age);
+    if (daysAgo <= 30) {
+      trendDataMap.set(daysAgo, (trendDataMap.get(daysAgo) || 0) + 1);
+    }
+  });
+
+  const reportTrendsData = Array.from({ length: 30 }).map((_, i) => {
+    const daysAgo = 29 - i;
+    const d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    return {
+      date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      issues: trendDataMap.get(daysAgo) || 0
+    };
+  });
 
   // --- STEWARD VIEWS DATA ---
   const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem("planner_recipient_email") || "shaikkashif40@gmail.com");
@@ -54,7 +93,7 @@ export function AdminDashboard() {
   const [exportResponse, setExportResponse] = useState<any>(null);
   const [exportError, setExportError] = useState("");
 
-  const urgentVerificationNeeded = cases.filter(c => getLifecycleStage(c) === 'Community verification needed' && c.severity >= 4);
+  const verificationQueue = cases.filter(c => getLifecycleStage(c) === 'Community verification needed');
   const duplicateFusionReview = cases.filter(c => c.duplicateRisk === 'High' && getLifecycleStage(c) !== 'Closed');
   const packetPreparationQueue = cases.filter(c => getLifecycleStage(c) === 'Community verified');
   const fixVerificationQueue = cases.filter(c => getLifecycleStage(c) === 'Fix verification needed' || getLifecycleStage(c) === 'Field repair claimed');
@@ -239,10 +278,10 @@ export function AdminDashboard() {
            <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[24px]">
              <CardContent className="p-4 md:p-5 flex flex-col gap-1">
                <div className="flex justify-between items-center mb-1">
-                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Urgent Verifications</span>
+                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Verification Queue</span>
                  <AlertCircle className="w-5 h-5 text-red-500" />
                </div>
-               <span className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{urgentVerificationNeeded.length}</span>
+               <span className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{verificationQueue.length}</span>
              </CardContent>
            </Card>
            <Card className="shadow-sm border-[#e2e8f0] dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[24px]">
@@ -275,13 +314,13 @@ export function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-           {/* Urgent Queue */}
+           {/* Verification Queue */}
            <section className="flex flex-col gap-4">
              <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-               Urgent Verification Needed <Badge className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/30 rounded-full px-2 py-0.5">{urgentVerificationNeeded.length}</Badge>
+               Community Verification Needed <Badge className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/30 rounded-full px-2 py-0.5">{verificationQueue.length}</Badge>
              </h2>
              <div className="flex flex-col gap-3">
-               {urgentVerificationNeeded.slice(0, 5).map(c => (
+               {verificationQueue.slice(0, 5).map(c => (
                   <div key={c.id} className="bg-white dark:bg-slate-800 border border-[#e2e8f0] dark:border-slate-700 p-5 rounded-[24px] shadow-sm flex flex-col gap-3 cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors" onClick={() => navigate(`/case/${c.id}`)}>
                     <div className="flex justify-between items-start gap-2">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-full truncate max-w-[150px]">{c.category}</span>
@@ -293,9 +332,9 @@ export function AdminDashboard() {
                     </div>
                   </div>
                ))}
-               {urgentVerificationNeeded.length === 0 && (
+               {verificationQueue.length === 0 && (
                  <div className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-[#e2e8f0] dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 text-sm font-medium shadow-sm">
-                    No urgent verifications needed.
+                    No verifications needed.
                  </div>
                )}
              </div>
@@ -721,6 +760,39 @@ export function AdminDashboard() {
           </span>
         </div>
       </div>
+
+      {/* Report Trends Chart */}
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <BarChart className="w-5 h-5 text-blue-500" />
+              Issue Volume Trends
+            </h3>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">Past 30 Days</span>
+          </div>
+          <div className="h-[240px] w-full mt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={reportTrendsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorIssues" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#64748b" opacity={0.2} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={30} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} dx={-10} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#f8fafc', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: '#60a5fa', fontWeight: 'bold' }}
+                />
+                <Area type="monotone" dataKey="issues" name="New Reports" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorIssues)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         

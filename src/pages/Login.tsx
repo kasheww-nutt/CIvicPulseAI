@@ -629,11 +629,11 @@ export function Login() {
         </div>
 
         {/* City skyline vector footer background */}
-        <div className="w-full relative h-[60px] pointer-events-none opacity-40 dark:opacity-20 mt-2">
+        <div className="absolute bottom-0 left-0 right-0 w-full pointer-events-none opacity-40 dark:opacity-20 z-0">
           <img 
             src="/chatgpt_city_skyline.png" 
-            alt="" 
-            className="w-full h-full object-cover object-bottom mix-blend-multiply dark:mix-blend-screen" 
+            alt="City Skyline" 
+            className="w-full h-auto object-cover object-bottom mix-blend-multiply dark:mix-blend-screen translate-y-1" 
           />
         </div>
 
