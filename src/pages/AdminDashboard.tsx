@@ -190,7 +190,7 @@ export function AdminDashboard() {
   // 1. CHOOSE STEWARD OPERATIONAL DASHBOARD
   if (userRole === 'steward') {
     return (
-      <div className="flex flex-col gap-6 max-w-6xl mx-auto p-4 md:p-6">
+      <div className="flex flex-col gap-4 md:gap-6 w-full mx-auto px-2 md:px-4">
         <header className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -553,7 +553,7 @@ export function AdminDashboard() {
   // 2. CHOOSE SYSTEM ADMIN CONTROL PANEL (THE BRAND NEW REQUESTED VIEW)
   // ==========================================
   return (
-    <div className="flex flex-col gap-6 max-w-6xl mx-auto p-4 md:p-6 text-slate-900 dark:text-slate-100">
+    <div className="flex flex-col gap-4 md:gap-6 w-full mx-auto px-2 md:px-4 text-slate-900 dark:text-slate-100">
       
       {/* Sovereign Admin Header */}
       <Card className="rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden mb-2 relative">

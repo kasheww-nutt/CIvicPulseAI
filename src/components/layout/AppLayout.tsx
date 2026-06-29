@@ -39,7 +39,7 @@ export function AppLayout() {
       
       <div className={cn(
         "w-full bg-[#f8f9fc] dark:bg-[#0a0f1c] min-h-screen relative shadow-2xl flex flex-col mx-auto",
-        isCitizenFlow ? "max-w-[430px] border-x border-[#e2e8f0] dark:border-slate-800" : "max-w-6xl border-none shadow-none"
+        isCitizenFlow ? "max-w-[430px] border-x border-[#e2e8f0] dark:border-slate-800" : "w-full border-none shadow-none"
       )}>
         
         {/* Top App Bar (Compact Android Style) */}
@@ -112,7 +112,7 @@ export function AppLayout() {
           "flex-1 w-full mx-auto",
           isCitizenFlow 
             ? (showBottomNav ? "pt-0 px-0 pb-24" : "pt-0 px-0 pb-6") 
-            : "pt-4 px-4 md:pt-8 md:px-8 pb-20 md:pb-8"
+            : "pt-4 px-2 md:pt-6 md:px-4 pb-20 md:pb-8"
         )}>
           <Outlet />
         </main>
