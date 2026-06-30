@@ -213,6 +213,12 @@ export function Login() {
     demoLogin();
   };
 
+  const handleQuickSandboxLogin = (role: 'citizen' | 'steward' | 'admin') => {
+    if (role === 'admin') demoLogin('admin@civicpulse.ai', 'Demo Admin', 'admin');
+    else if (role === 'steward') demoLogin('steward@civicpulse.ai', 'Demo Steward', 'steward');
+    else demoLogin('demo@civicpulse.ai', 'Demo Citizen', 'citizen');
+  };
+
   // Listen for login and route based on role
   const { user, dbRole, signOut } = useAuth();
 
@@ -415,7 +421,44 @@ export function Login() {
 
                 </div>
 
-                <div className="mt-8 text-center text-xs text-slate-400 max-w-[280px]">
+                {/* Hackathon Judge Sandbox Section */}
+                <div className="w-full mt-5 p-3.5 rounded-2xl border border-amber-200/50 dark:border-amber-900/30 bg-amber-500/[0.03] dark:bg-amber-400/[0.01]">
+                  <div className="flex items-center gap-1.5 mb-2 justify-center">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Jury Sandbox Bypass</span>
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 mb-2.5 text-center">
+                    Tap below to instantly log in with preloaded hackathon records:
+                  </p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button
+                      onClick={() => handleQuickSandboxLogin('citizen')}
+                      className="py-1.5 px-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95 text-center flex flex-col items-center gap-0.5 shadow-sm"
+                    >
+                      <span className="text-blue-500 font-extrabold text-[11px]">Citizen</span>
+                      <span className="text-[8px] font-normal text-slate-400">Level 1</span>
+                    </button>
+                    <button
+                      onClick={() => handleQuickSandboxLogin('steward')}
+                      className="py-1.5 px-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95 text-center flex flex-col items-center gap-0.5 shadow-sm"
+                    >
+                      <span className="text-emerald-500 font-extrabold text-[11px]">Steward</span>
+                      <span className="text-[8px] font-normal text-slate-400">Level 2</span>
+                    </button>
+                    <button
+                      onClick={() => handleQuickSandboxLogin('admin')}
+                      className="py-1.5 px-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95 text-center flex flex-col items-center gap-0.5 shadow-sm"
+                    >
+                      <span className="text-amber-500 font-extrabold text-[11px]">Admin</span>
+                      <span className="text-[8px] font-normal text-slate-400">Level 3</span>
+                    </button>
+                  </div>
+                  <div className="text-[9px] text-center text-slate-400 dark:text-slate-500 mt-2 font-mono">
+                    Password bypass: <span className="font-bold text-amber-600 dark:text-amber-400">pass123</span>
+                  </div>
+                </div>
+
+                <div className="mt-5 text-center text-[11px] text-slate-400 max-w-[280px]">
                   CivicPulse AI platform provides decentralized validation of public infrastructure reports.
                 </div>
               </motion.div>
@@ -500,6 +543,39 @@ export function Login() {
                 {authMode === 'signin' ? (
                   /* SIGN IN FORM */
                   <form className="space-y-3 mt-4" onSubmit={handleEmailLogin}>
+                    {/* Auto-fill Helper for judges */}
+                    <div className="bg-amber-500/[0.04] dark:bg-amber-400/[0.02] border border-amber-200/40 dark:border-amber-900/40 rounded-2xl p-3 flex items-center justify-between gap-3 text-left">
+                      <div className="flex-1 min-w-0">
+                        <span className="block text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Jury Auto-Fill Demo</span>
+                        <span className="block text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          {selectedRole === 'citizen' && 'demo@civicpulse.ai'}
+                          {selectedRole === 'steward' && 'steward@civicpulse.ai'}
+                          {selectedRole === 'admin' && 'admin@civicpulse.ai'}
+                        </span>
+                        <span className="block text-[9px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">
+                          Password: pass123
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (selectedRole === 'admin') {
+                            setEmail('admin@civicpulse.ai');
+                            setPassword('pass123');
+                          } else if (selectedRole === 'steward') {
+                            setEmail('steward@civicpulse.ai');
+                            setPassword('pass123');
+                          } else {
+                            setEmail('demo@civicpulse.ai');
+                            setPassword('pass123');
+                          }
+                        }}
+                        className="py-1.5 px-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-bold transition-all active:scale-95 shrink-0 shadow-sm"
+                      >
+                        Auto-Fill
+                      </button>
+                    </div>
+
                     <div>
                       <label className="block text-[11px] font-bold text-[#0a1930] dark:text-slate-300 uppercase tracking-wider ml-1 mb-1">
                         Email Address
