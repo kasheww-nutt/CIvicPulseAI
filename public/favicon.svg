@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#02102c" />
+      <stop offset="100%" stop-color="#051c44" />
+    </linearGradient>
+
+    <!-- Pulse Line Gradient (Electric Blue Glow) -->
+    <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="50%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+
+    <!-- Node Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <blur stdDeviation="8" result="blur" />
+      <composite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Deep Navy Dark Squircle Background -->
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#bgGrad)" />
+
+  <!-- Outer Hexagon Network Connections (Sleek White/Blue lines) -->
+  <polyline points="256,100 392,178 392,334 256,412 120,334 120,178 256,100" 
+            fill="none" 
+            stroke="#ffffff" 
+            stroke-width="8" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            opacity="0.8" />
+
+  <!-- Horizontal pulse background/connecting lines -->
+  <path d="M 105 256 L 210 256 M 302 256 L 407 256" 
+        stroke="url(#pulseGrad)" 
+        stroke-width="12" 
+        stroke-linecap="round" 
+        opacity="0.9" />
+
+  <!-- Heartbeat Pulse Line with custom nodes -->
+  <path d="M 205 256 L 222 280 L 250 165 L 276 305 L 292 242 L 305 256" 
+        fill="none" 
+        stroke="url(#pulseGrad)" 
+        stroke-width="12" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Checkmark at the bottom center (representing verified/civic check) -->
+  <path d="M 230 325 L 256 352 L 302 292" 
+        fill="none" 
+        stroke="#ffffff" 
+        stroke-width="12" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Connected Nodes (Circles) with subtle 3D gradients and glow -->
+  <!-- Top Node: Soft Blue -->
+  <circle cx="256" cy="100" r="28" fill="#60a5fa" stroke="#02102c" stroke-width="5" />
+  
+  <!-- Left-Top Node: Crisp White -->
+  <circle cx="120" cy="178" r="24" fill="#ffffff" stroke="#02102c" stroke-width="5" />
+  
+  <!-- Right-Top Node: Crisp White -->
+  <circle cx="392" cy="178" r="24" fill="#ffffff" stroke="#02102c" stroke-width="5" />
+  
+  <!-- Left-Bottom Node: Vibrant Blue -->
+  <circle cx="120" cy="334" r="26" fill="#3b82f6" stroke="#02102c" stroke-width="5" />
+  
+  <!-- Right-Bottom Node: Vibrant Blue -->
+  <circle cx="392" cy="334" r="26" fill="#3b82f6" stroke="#02102c" stroke-width="5" />
+  
+  <!-- Bottom Node: Crisp White -->
+  <circle cx="256" cy="412" r="24" fill="#ffffff" stroke="#02102c" stroke-width="5" />
+</svg>
