@@ -3,6 +3,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { Resend } from "resend";
 import dotenv from "dotenv";
+import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
@@ -13,7 +14,8 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   // API routes FIRST
   app.post("/api/send-otp", async (req, res) => {
@@ -450,75 +452,85 @@ async function startServer() {
         return res.status(500).json({ error: "Server missing GEMINI_API_KEY" });
       }
 
+      // Initialize the Gemini client lazily
+      const ai = new GoogleGenAI({
+        apiKey: apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
       const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
       const prompt = `Analyze this civic issue report.
 Description provided: ${input.description || 'None'}
 Location provided: ${input.location || 'None'}
 
-You MUST analyze the provided image. Use the image to determine the severity, category, and evidence quality.
+You MUST analyze the provided image (if any) and the description.
+First, determine if there is actually a genuine, visible civic, public infrastructure, municipal utility, public safety, or environmental issue present.
+Examples of real civic issues include:
+- Potholes / road damage / sinkholes
+- Streetlight out / electrical hazards / dark pedestrian paths
+- Water leaks / pipe bursts / flooding / open manholes
+- Garbage / trash dumping / debris / overflow
+- Vandalism / graffiti / broken public property / broken park benches
+- Broken sidewalk / pedestrian hazards / blocked paths
+- Blocked sewers / drainage problems
+- Fallen trees / blocked roads
+
+IMPORTANT: Be extremely honest and accurate. If the image is of a person, a blank screen, a generic indoor room, a keyboard, a desk, a pet, or anything that does NOT depict a visible public infrastructure or municipal civic issue, you MUST set "isCivicIssue" to false. Do not hallucinate or map normal scenes to civic hazards.
 
 De-Escalation Engine: If the citizen's description is angry, emotional, or aggressive, translate it into a completely objective, municipal-standard description for the "objectiveDescription" field, retaining only the critical facts.
 Also, provide an "additionalSummary" based solely on the visual evidence in the image (e.g. "The pothole is approximately 2 feet wide and filled with water").
 
 Return ONLY a valid JSON object matching this schema exactly, with no markdown formatting:
 {
-  "category": "string (e.g. Pothole, Streetlight, Vandalism, Water Leak)",
-  "summary": "string (brief 1-2 sentence description)",
-  "additionalSummary": "string (details extracted purely from the image)",
-  "objectiveDescription": "string (de-escalated, objective, municipal-standard translation of the citizen's description)",
-  "severity": number (1 to 5, where 5 is critical/dangerous),
-  "suggestedDepartment": "string",
+  "isCivicIssue": boolean,
+  "category": "string (The classified category, e.g. 'Pothole / Road Damage', 'Streetlight Out / Electrical', 'Water Leak / Flooding', 'Garbage / Illegal Dumping', 'Vandalism / Graffiti', 'Broken Sidewalk', or 'Other / Safety Hazard'. If isCivicIssue is false, use 'No Civic Issue Detected')",
+  "summary": "string (brief 1-2 sentence description of the issue. If isCivicIssue is false, explain that no civic issue is visible in the frame/image)",
+  "additionalSummary": "string (details extracted purely from the image. If isCivicIssue is false, describe what is actually visible, e.g. 'Office desk with keyboard')",
+  "objectiveDescription": "string (de-escalated, objective, municipal-standard translation of the citizen's description. If description is empty or non-applicable, provide a short professional neutral summary)",
+  "severity": number (1 to 5, where 5 is critical/dangerous. If isCivicIssue is false, set to 1),
+  "suggestedDepartment": "string (e.g. 'Public Works Department', 'Electricity Board', 'Water and Sewerage Board', 'Sanitation Department', etc. If isCivicIssue is false, set to 'N/A')",
   "locationConfidence": "High" | "Medium" | "Low",
   "evidenceQuality": "High" | "Medium" | "Low",
-  "missingInformation": ["string", "string"],
+  "missingInformation": ["string"],
   "duplicateClues": ["string"],
-  "citizenSafetyNote": "string",
+  "citizenSafetyNote": "string (Advice for citizens. If isCivicIssue is false, set to 'N/A')",
   "confidence": "High" | "Medium" | "Low"
 }`;
 
-      let contents: any[] = [{ role: "user", parts: [{ text: prompt }] }];
+      const parts: any[] = [{ text: prompt }];
 
       if (input.imageBase64 && input.mimeType) {
-          contents = [{
-            role: "user",
-            parts: [
-              { text: prompt },
-              { 
-                inline_data: { 
-                  data: input.imageBase64, 
-                  mime_type: input.mimeType 
-                } 
-              }
-            ]
-          }];
+        parts.push({
+          inlineData: {
+            data: input.imageBase64,
+            mimeType: input.mimeType
+          }
+        });
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents,
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.2
-          }
-        })
+      console.log(`Analyzing issue using model ${model} with image: ${!!input.imageBase64}`);
+
+      const response = await ai.models.generateContent({
+        model: model,
+        contents: { parts },
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.2
+        }
       });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error("Gemini API error:", response.status, errText);
-        return res.status(response.status).json({ error: `Gemini API error: ${response.statusText}` });
-      }
-
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = response.text;
       
       if (!text) {
         return res.status(500).json({ error: "No text returned from Gemini" });
       }
 
+      console.log("Raw Gemini Response text successfully parsed.");
       res.json({ text });
     } catch (error: any) {
       console.error("Gemini analysis error:", error);

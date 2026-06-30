@@ -150,7 +150,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
 
           const enrichedCase: CivicCase = {
             ...c,
-            authorId: authorId || undefined,
+            authorId: authorId || 'system-seed',
             verifiedUsers: c.verifiedUsers || (c.verifiedByMe ? ['system-seed'] : [])
           };
           try {
